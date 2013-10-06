@@ -6,7 +6,6 @@ tmp/**/*
 *.bak
 *.launch
 local.properties
-.classpath
 .settings/
 .loadpath
 
