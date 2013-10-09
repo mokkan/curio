@@ -2,6 +2,8 @@
 
 + **[4]** Add player character that can collide with map tiles
 + **[5]** Make window/game rendering scale-able
++ **[6]** Refactor code to allow for multiple game states
++ **[7]** Add loading screen for main game state
 
 
 ## Resolved Issues ##
