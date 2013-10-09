@@ -2,13 +2,17 @@ package com.wasome.curio;
 
 import com.artemis.World;
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 
 public class Game implements ApplicationListener {
+	private AssetManager assetManager;
 	private World world; 
 
     @Override
     public void create() {
+    	assetManager = new AssetManager();
+    	
         world = new World();
         world.initialize();
     }
