@@ -10,7 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
-public class Game implements ApplicationListener {
+public class Curio implements ApplicationListener {
     private AssetManager assetManager;
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -89,7 +89,7 @@ public class Game implements ApplicationListener {
     }
     
     public static void main(String[] args) {
-        new LwjglApplication(new Game(), "Curio", 640, 480, false);
+        new LwjglApplication(new Curio(), "Curio", 640, 480, false);
     }
 
 }
