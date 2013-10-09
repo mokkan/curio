@@ -1,24 +1,23 @@
 package com.wasome.curio;
 
 import com.artemis.World;
-import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
-public class Game implements ApplicationListener {
+public class GameScreen implements Screen {
+    
     private AssetManager assetManager;
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
     private World world;
 
-    @Override
-    public void create() {
+    public GameScreen(Curio game) {
         assetManager = new AssetManager();
         
         // Set the tile map loader for the asset manager
@@ -39,12 +38,6 @@ public class Game implements ApplicationListener {
         world = new World();
         world.initialize();
     }
-
-    @Override
-    public void resize(int width, int height) {
-        // TODO Auto-generated method stub
-        
-    }
     
     public void update() {
         world.process();
@@ -52,7 +45,7 @@ public class Game implements ApplicationListener {
     
 
     @Override
-    public void render() {
+    public void render(float delta) {
         // Make sure assets are loaded
         if (!assetManager.update()) {
             return;
@@ -68,6 +61,24 @@ public class Game implements ApplicationListener {
         update();
         
         mapRenderer.render();
+    }
+    
+    @Override
+    public void resize(int width, int height) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void show() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void hide() {
+        // TODO Auto-generated method stub
+        
     }
 
     @Override
@@ -86,10 +97,6 @@ public class Game implements ApplicationListener {
     public void dispose() {
         // TODO Auto-generated method stub
         
-    }
-    
-    public static void main(String[] args) {
-        new LwjglApplication(new Game(), "Curio", 640, 480, false);
     }
 
 }
