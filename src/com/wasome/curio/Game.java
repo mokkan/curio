@@ -1,14 +1,16 @@
 package com.wasome.curio;
 
+import com.artemis.World;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 
 public class Game implements ApplicationListener {
+	private World world; 
 
     @Override
     public void create() {
-        // TODO Auto-generated method stub
-        
+        world = new World();
+        world.initialize();
     }
 
     @Override
@@ -16,11 +18,15 @@ public class Game implements ApplicationListener {
         // TODO Auto-generated method stub
         
     }
+    
+    public void update() {
+    	world.process();
+    }
+    
 
     @Override
     public void render() {
-        // TODO Auto-generated method stub
-        
+        update();
     }
 
     @Override
