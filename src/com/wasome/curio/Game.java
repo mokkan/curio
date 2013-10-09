@@ -9,23 +9,23 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 public class Game implements ApplicationListener {
-	private AssetManager assetManager;
-	private TiledMap map;
-	private World world; 
+    private AssetManager assetManager;
+    private TiledMap map;
+    private World world; 
 
     @Override
     public void create() {
-    	assetManager = new AssetManager();
-    	
-    	// Set the tile map loader for the asset manager
-    	assetManager.setLoader(
+        assetManager = new AssetManager();
+        
+        // Set the tile map loader for the asset manager
+        assetManager.setLoader(
                 TiledMap.class,
                 new TmxMapLoader(new InternalFileHandleResolver())
         );
-    	
-    	// Load level 1
-    	assetManager.load("assets/levels/level1.tmx", TiledMap.class);
-    	
+        
+        // Load level 1
+        assetManager.load("assets/levels/level1.tmx", TiledMap.class);
+        
         world = new World();
         world.initialize();
     }
@@ -37,7 +37,7 @@ public class Game implements ApplicationListener {
     }
     
     public void update() {
-    	world.process();
+        world.process();
     }
     
 
