@@ -2,6 +2,7 @@ package com.wasome.curio;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 public class Curio extends Game {
 
@@ -14,7 +15,13 @@ public class Curio extends Game {
     }
     
     public static void main(String[] args) {
-        new LwjglApplication(new Curio(), "Curio", 640, 480, false);
+        LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
+        cfg.title = "Curio";
+        cfg.width = 640;
+        cfg.height = 480;
+        cfg.useGL20 = false;
+        cfg.resizable = false;
+        new LwjglApplication(new Curio(), cfg);
     }
 
 }
