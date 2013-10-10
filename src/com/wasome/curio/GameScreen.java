@@ -1,6 +1,7 @@
 package com.wasome.curio;
 
 import com.artemis.World;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
@@ -12,10 +13,15 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 public class GameScreen implements Screen {
     
     private AssetManager assetManager;
-    private OrthographicCamera camera;
+    private OrthographicCamera cam;
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
     private World world;
+    private int camWidth;
+    private int camHeight;
+    private int zoomFactor;
+    final protected static int gameWidth = 640;
+    final protected static int gameHeight = 480;
 
     public GameScreen(Curio game) {
         assetManager = new AssetManager();
@@ -30,11 +36,13 @@ public class GameScreen implements Screen {
         assetManager.load("assets/levels/level1.tmx", TiledMap.class);
 
         // Create camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 640, 480);
-        camera.translate(-16, -48);
-        camera.update();
-        
+        zoomFactor = Gdx.graphics.getHeight() /  gameHeight;
+        camWidth = Gdx.graphics.getWidth() - ((zoomFactor - 1) * gameWidth);
+        camHeight = Gdx.graphics.getHeight() - ((zoomFactor - 1) * gameHeight);
+
+        cam = new OrthographicCamera();
+        cam.setToOrtho(false, camWidth, camHeight);
+
         world = new World();
         world.initialize();
     }
@@ -52,15 +60,32 @@ public class GameScreen implements Screen {
         }
         
         if (mapRenderer == null) {
-            System.out.println("Test");
             map = assetManager.get("assets/levels/level1.tmx");
             mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
-            mapRenderer.setView(camera);
         }
         
         update();
         
+        // Draw screen background
+        // ... TODO
+        
+        // Draw the UI
+        int horizTrans = (camWidth - gameWidth) / 2;
+        int vertTrans = (camHeight - gameHeight) / 2;
+        
+        cam.translate(-horizTrans, -vertTrans);
+        cam.update();
+        
+        // Draw the map and entities
+        cam.translate(-16, -48);
+        cam.update();
+        
+        mapRenderer.setView(cam);
         mapRenderer.render();
+        
+        // Undo our translates
+        cam.translate(16 + horizTrans, 48 + vertTrans);
+        cam.update();
     }
     
     @Override
