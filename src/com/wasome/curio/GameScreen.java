@@ -57,11 +57,6 @@ public class GameScreen implements Screen {
         e.addComponent(new Position(0, 0));
         e.addToWorld();
     }
-    
-    public void update() {
-        //world.process();
-    }
-    
 
     @Override
     public void render(float delta) {
@@ -74,8 +69,6 @@ public class GameScreen implements Screen {
             map = assetManager.get("assets/levels/level1.tmx");
             mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
         }
-        
-        update();
         
         // Clear the screen
         Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
@@ -91,13 +84,15 @@ public class GameScreen implements Screen {
         cam.translate(-horizTrans, -vertTrans);
         cam.update();
         
-        // Draw the map and entities
+        // Translate for drawing maps and entities
         cam.translate(-16, -48);
         cam.update();
         
+        // Draw map
         mapRenderer.setView(cam);
         mapRenderer.render();
         
+        // Process and draw entities 
         world.process();
         
         // Undo our translates
