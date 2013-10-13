@@ -17,8 +17,8 @@ public class Curio extends Game {
     public static void main(String[] args) {
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         cfg.title = "Curio";
-        cfg.width = 640;
-        cfg.height = 480;
+        cfg.width = 1280;
+        cfg.height = 960;
         cfg.useGL20 = false;
         cfg.resizable = false;
         new LwjglApplication(new Curio(), cfg);

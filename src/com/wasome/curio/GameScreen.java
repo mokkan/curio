@@ -1,5 +1,6 @@
 package com.wasome.curio;
 
+import com.artemis.Entity;
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,6 +11,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.wasome.curio.components.Position;
+import com.wasome.curio.systems.RenderingSystem;
 
 public class GameScreen implements Screen {
     
@@ -44,12 +47,19 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, camWidth, camHeight);
 
+        // Set up entity system
         world = new World();
+        world.setSystem(new RenderingSystem(cam));
         world.initialize();
+        
+        // Add test entity
+        Entity e = world.createEntity();
+        e.addComponent(new Position(0, 0));
+        e.addToWorld();
     }
     
     public void update() {
-        world.process();
+        //world.process();
     }
     
 
@@ -87,6 +97,8 @@ public class GameScreen implements Screen {
         
         mapRenderer.setView(cam);
         mapRenderer.render();
+        
+        world.process();
         
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);
