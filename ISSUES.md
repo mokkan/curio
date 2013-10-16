@@ -1,6 +1,9 @@
 ## Open Issues ##
 
 + **[7]** Add loading screen for main game state
++ **[8]** Constrain player movement to horizontal axis
++ **[9]** Add gravity system
++ **[10]** Add ability for player to jump
 
 
 ## Resolved Issues ##
