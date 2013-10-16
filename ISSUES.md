@@ -14,3 +14,4 @@
 + **[4]** Add player character that can collide with map tiles
 + **[6]** Refactor code to allow for multiple game states
 + **[8]** Constrain player movement to horizontal axis
++ **[9]** Add gravity system
