@@ -2,6 +2,8 @@ package com.wasome.curio;
 
 import com.artemis.Entity;
 import com.artemis.World;
+import com.artemis.managers.GroupManager;
+import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -12,6 +14,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.wasome.curio.components.Position;
+import com.wasome.curio.components.Velocity;
+import com.wasome.curio.systems.InputSystem;
+import com.wasome.curio.systems.MovementSystem;
 import com.wasome.curio.systems.RenderingSystem;
 
 public class GameScreen implements Screen {
@@ -21,6 +26,8 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
     private World world;
+    private RenderingSystem renderingSystem;
+    private InputSystem inputSystem;
     private int camWidth;
     private int camHeight;
     private int zoomFactor;
@@ -48,14 +55,32 @@ public class GameScreen implements Screen {
         cam.setToOrtho(false, camWidth, camHeight);
 
         // Set up entity system
+        inputSystem = new InputSystem();
+        renderingSystem = new RenderingSystem(cam);
+        
         world = new World();
-        world.setSystem(new RenderingSystem(cam));
+        
+        world.setManager(new GroupManager());
+        world.setManager(new TagManager());
+        
+        world.setSystem(renderingSystem);
+        world.setSystem(inputSystem);
+        world.setSystem(new MovementSystem());
+        
         world.initialize();
         
-        // Add test entity
+        initPlayer();
+        
+        Gdx.input.setInputProcessor(inputSystem);
+    }
+    
+    private void initPlayer() {
         Entity e = world.createEntity();
         e.addComponent(new Position(0, 0));
-        e.addToWorld();
+        e.addComponent(new Velocity(0, 0));
+        
+        world.getManager(TagManager.class).register("PLAYER", e);
+        world.addEntity(e);
     }
 
     @Override
@@ -70,6 +95,10 @@ public class GameScreen implements Screen {
             mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
         }
         
+        // Process and draw entities 
+        world.setDelta(delta * 1000);
+        world.process();
+
         // Clear the screen
         Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -92,8 +121,8 @@ public class GameScreen implements Screen {
         mapRenderer.setView(cam);
         mapRenderer.render();
         
-        // Process and draw entities 
-        world.process();
+        // Draw entities
+        renderingSystem.process();
         
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);
