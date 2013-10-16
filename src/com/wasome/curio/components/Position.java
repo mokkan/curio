@@ -30,4 +30,12 @@ public class Position extends Component {
         this.y = y;
     }
     
+    public void addX(float dx) {
+        x += dx;
+    }
+    
+    public void addY(float dy) {
+        y += dy;
+    }
+    
 }
