@@ -25,40 +25,12 @@ public class InputSystem extends IntervalEntitySystem
     @Override
     protected void processEntities(ImmutableBag<Entity> entities) {
         player = world.getManager(TagManager.class).getEntity("PLAYER");
-        
-        /*if (player != null) {
-            Velocity v = velocityMapper.get(player);
-            
-            if (Gdx.input.isKeyPressed(Keys.W)) {
-                v.setVelY(1);
-            }
-            
-            if (Gdx.input.isKeyPressed(Keys.S)) {
-                v.setVelY(-1);
-            }
-            
-            if (Gdx.input.isKeyPressed(Keys.A)) {
-                v.setVelX(-1);
-            }
-            
-            if (Gdx.input.isKeyPressed(Keys.D)) {
-                v.setVelX(1);
-            }
-        }*/
     }
 
     @Override
     public boolean keyDown(int keycode) {
         if (player != null) {
             Velocity v = velocityMapper.get(player);
-            
-            if (keycode == Keys.W) {
-                v.setY(1);
-            }
-            
-            if (keycode == Keys.S) {
-                v.setY(-1);
-            }
             
             if (keycode == Keys.A) {
                 v.setX(-1);
@@ -77,13 +49,7 @@ public class InputSystem extends IntervalEntitySystem
     public boolean keyUp(int keycode) {
         if (player != null) {
             Velocity v = velocityMapper.get(player);
-            
-            if ((keycode == Keys.W && !Gdx.input.isKeyPressed(Keys.S)) ||
-                    (keycode == Keys.S && !Gdx.input.isKeyPressed(Keys.W))) {
-                
-                v.setY(0);
-            }
-            
+
             if ((keycode == Keys.A && !Gdx.input.isKeyPressed(Keys.D)) ||
                     (keycode == Keys.D && !Gdx.input.isKeyPressed(Keys.A))) {
                 
