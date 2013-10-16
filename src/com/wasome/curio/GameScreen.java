@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.wasome.curio.components.Position;
+import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Velocity;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -45,6 +46,9 @@ public class GameScreen implements Screen {
         
         // Load level 1
         assetManager.load("assets/levels/level1.tmx", TiledMap.class);
+        assetManager.finishLoading();
+        map = assetManager.get("assets/levels/level1.tmx");
+        mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
 
         // Create camera
         zoomFactor = Gdx.graphics.getHeight() /  gameHeight;
@@ -65,7 +69,7 @@ public class GameScreen implements Screen {
         
         world.setSystem(renderingSystem);
         world.setSystem(inputSystem);
-        world.setSystem(new MovementSystem());
+        world.setSystem(new MovementSystem(map));
         
         world.initialize();
         
@@ -76,7 +80,8 @@ public class GameScreen implements Screen {
     
     private void initPlayer() {
         Entity e = world.createEntity();
-        e.addComponent(new Position(0, 0));
+        e.addComponent(new Position(40, 40));
+        e.addComponent(new Size(16, 16));
         e.addComponent(new Velocity(0, 0));
         
         world.getManager(TagManager.class).register("PLAYER", e);
@@ -85,16 +90,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        // Make sure assets are loaded
-        if (!assetManager.update()) {
-            return;
-        }
-        
-        if (mapRenderer == null) {
-            map = assetManager.get("assets/levels/level1.tmx");
-            mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
-        }
-        
         // Process and draw entities 
         world.setDelta(delta * 1000);
         world.process();

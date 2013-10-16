@@ -14,19 +14,19 @@ public class Velocity extends Component {
         this.vy = vy;
     }
     
-    public float getVelX() {
+    public float getX() {
         return vx;
     }
     
-    public float getVelY() {
+    public float getY() {
         return vy;
     }
     
-    public void setVelX(float vx) {
+    public void setX(float vx) {
         this.vx = vx;
     }
     
-    public void setVelY(float vy) {
+    public void setY(float vy) {
         this.vy = vy;
     }
     

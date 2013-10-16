@@ -25,6 +25,26 @@ public class InputSystem extends IntervalEntitySystem
     @Override
     protected void processEntities(ImmutableBag<Entity> entities) {
         player = world.getManager(TagManager.class).getEntity("PLAYER");
+        
+        /*if (player != null) {
+            Velocity v = velocityMapper.get(player);
+            
+            if (Gdx.input.isKeyPressed(Keys.W)) {
+                v.setVelY(1);
+            }
+            
+            if (Gdx.input.isKeyPressed(Keys.S)) {
+                v.setVelY(-1);
+            }
+            
+            if (Gdx.input.isKeyPressed(Keys.A)) {
+                v.setVelX(-1);
+            }
+            
+            if (Gdx.input.isKeyPressed(Keys.D)) {
+                v.setVelX(1);
+            }
+        }*/
     }
 
     @Override
@@ -33,19 +53,19 @@ public class InputSystem extends IntervalEntitySystem
             Velocity v = velocityMapper.get(player);
             
             if (keycode == Keys.W) {
-                v.setVelY(1);
+                v.setY(1);
             }
             
             if (keycode == Keys.S) {
-                v.setVelY(-1);
+                v.setY(-1);
             }
             
             if (keycode == Keys.A) {
-                v.setVelX(-1);
+                v.setX(-1);
             }
             
             if (keycode == Keys.D) {
-                v.setVelX(1);
+                v.setX(1);
             }
 
         }
@@ -61,13 +81,13 @@ public class InputSystem extends IntervalEntitySystem
             if ((keycode == Keys.W && !Gdx.input.isKeyPressed(Keys.S)) ||
                     (keycode == Keys.S && !Gdx.input.isKeyPressed(Keys.W))) {
                 
-                v.setVelY(0);
+                v.setY(0);
             }
             
             if ((keycode == Keys.A && !Gdx.input.isKeyPressed(Keys.D)) ||
                     (keycode == Keys.D && !Gdx.input.isKeyPressed(Keys.A))) {
                 
-                v.setVelX(0);
+                v.setX(0);
             }
         }
 
