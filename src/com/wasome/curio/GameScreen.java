@@ -13,9 +13,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Velocity;
+import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
 import com.wasome.curio.systems.RenderingSystem;
@@ -70,6 +72,7 @@ public class GameScreen implements Screen {
         world.setSystem(renderingSystem);
         world.setSystem(inputSystem);
         world.setSystem(new MovementSystem(map));
+        world.setSystem(new GravitySystem());
         
         world.initialize();
         
@@ -80,9 +83,10 @@ public class GameScreen implements Screen {
     
     private void initPlayer() {
         Entity e = world.createEntity();
-        e.addComponent(new Position(40, 40));
+        e.addComponent(new Position(136, 136));
         e.addComponent(new Size(16, 16));
         e.addComponent(new Velocity(0, 0));
+        e.addComponent(new Gravity(-3.0f, -0.5f));
         
         world.getManager(TagManager.class).register("PLAYER", e);
         world.addEntity(e);
