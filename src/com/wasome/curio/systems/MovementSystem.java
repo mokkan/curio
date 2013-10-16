@@ -35,7 +35,6 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         boolean collisionX = false, collisionY = false;
         
         pos.addX(vel.getX());
-        pos.addY(vel.getY());
         
         if (vel.getX() < 0) {
             collisionX = checkLeftCollisions(e);
@@ -47,6 +46,8 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
             pos.setX(oldX);
         }
         
+        pos.addY(vel.getY());
+        
         if (vel.getY() < 0) {
             collisionY = checkBottomCollisions(e);
         } else if (vel.getY() > 0) {
@@ -55,6 +56,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         
         if (collisionY) {
             pos.setY(oldY);
+            vel.setY(0);
         }
     }
     
