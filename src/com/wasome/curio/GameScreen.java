@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
@@ -86,7 +87,8 @@ public class GameScreen implements Screen {
         e.addComponent(new Position(136, 136));
         e.addComponent(new Size(16, 16));
         e.addComponent(new Velocity(0, 0));
-        e.addComponent(new Gravity(-3.0f, -0.5f));
+        e.addComponent(new Gravity(-3.0f, -0.25f));
+        e.addComponent(new Creature());
         
         world.getManager(TagManager.class).register("PLAYER", e);
         world.addEntity(e);

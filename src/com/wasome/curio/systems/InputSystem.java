@@ -10,12 +10,14 @@ import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Velocity;
 
 public class InputSystem extends IntervalEntitySystem
     implements InputProcessor {
     
     @Mapper ComponentMapper<Velocity> velocityMapper;
+    @Mapper ComponentMapper<Creature> creatureMapper;
     private Entity player;
 
     public InputSystem() {
@@ -31,15 +33,19 @@ public class InputSystem extends IntervalEntitySystem
     public boolean keyDown(int keycode) {
         if (player != null) {
             Velocity v = velocityMapper.get(player);
+            Creature creature = creatureMapper.get(player);
             
-            if (keycode == Keys.A) {
+            if (keycode == Keys.LEFT) {
                 v.setX(-1);
             }
             
-            if (keycode == Keys.D) {
+            if (keycode == Keys.RIGHT) {
                 v.setX(1);
             }
-
+            
+            if (keycode == Keys.SPACE && creature.getStatus() != Creature.STATUS_JUMPING) {
+                v.setY(3.0f);
+            }
         }
         
         return false;
@@ -50,8 +56,8 @@ public class InputSystem extends IntervalEntitySystem
         if (player != null) {
             Velocity v = velocityMapper.get(player);
 
-            if ((keycode == Keys.A && !Gdx.input.isKeyPressed(Keys.D)) ||
-                    (keycode == Keys.D && !Gdx.input.isKeyPressed(Keys.A))) {
+            if ((keycode == Keys.LEFT && !Gdx.input.isKeyPressed(Keys.RIGHT)) ||
+                (keycode == Keys.RIGHT && !Gdx.input.isKeyPressed(Keys.LEFT))) {
                 
                 v.setX(0);
             }
