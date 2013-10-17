@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Velocity;
@@ -18,6 +19,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     @Mapper ComponentMapper<Position> positionMapper;
     @Mapper ComponentMapper<Velocity> velocityMapper;
     @Mapper ComponentMapper<Size> sizeMapper;
+    @Mapper ComponentMapper<Creature> creatureMapper;
     TiledMap map;
     
     @SuppressWarnings("unchecked")
@@ -30,6 +32,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     protected void process(Entity e) {
         Position pos = positionMapper.get(e);
         Velocity vel = velocityMapper.get(e);
+        Creature creature = creatureMapper.get(e);
         
         float oldX = pos.getX(), oldY = pos.getY();
         boolean collisionX = false, collisionY = false;
@@ -57,6 +60,16 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         if (collisionY) {
             pos.setY(oldY);
             vel.setY(0);
+        }
+        
+        if (vel.getY() != 0) {
+            creature.setStatus(Creature.STATUS_JUMPING);
+        } else {
+            if (vel.getX() != 0) {
+                creature.setStatus(Creature.STATUS_WALKING);
+            } else {
+                creature.setStatus(Creature.STATUS_IDLE);
+            }
         }
     }
     
