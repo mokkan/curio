@@ -31,7 +31,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera cam;
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
-    private Texture background;
+    private Texture levelBg;
     private World world;
     private RenderingSystem renderingSystem;
     private InputSystem inputSystem;
@@ -60,7 +60,7 @@ public class GameScreen implements Screen {
         String bgFile = map.getProperties().get("background").toString();
         assetManager.load("assets/backgrounds/" + bgFile, Texture.class);
         assetManager.finishLoading();
-        background = assetManager.get("assets/backgrounds/" + bgFile);
+        levelBg = assetManager.get("assets/backgrounds/" + bgFile);
 
         // Create camera
         zoomFactor = Gdx.graphics.getHeight() /  gameHeight;
@@ -131,7 +131,7 @@ public class GameScreen implements Screen {
         // Draw level background
         SpriteBatch b = mapRenderer.getSpriteBatch();
         b.begin();
-        b.draw(background, 0, 0);
+        b.draw(levelBg, 0, 0);
         b.end();
         
         // Draw map
