@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="38" height="26" tilewidth="16" tileheight="16">
- <tileset firstgid="1" source="../tilesets/basic.tsx"/>
- <layer name="Tile Layer 1" width="38" height="26">
+ <tileset firstgid="1" source="../tilesets/cavern.tsx"/>
+ <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3UMQ4AIQhEUeT+h7Y3TmAoBJP5CZ1kX+G6zGwNnWnJxSUXl1xc3a7bm+WBy8Fe9v2r7mZcHcnF9YML3fEJrinJhb8bzWtXVIeVcVX3K8nF1eFC/5ofZ7IuTX42CJSBnHAPAAA=
+   H4sIAAAAAAAAA+2WSw6AIAxEK27EjXoA4f63tMY00SrKLwLKJG+BCzIZ2wkSAMbMkEgP+amD6muvGVGINpxrXkfVvNxUcl5rh6kA9OnWZ5WcV50ve73li/KwndW/5+Uqm57w6YEYvnLNK6WvBhFIy76n9kVzxD3E8MU7wGUeB9je89ONL965KZX6P5r0ZV+0UwTfLR/RPogA5AUh9xELNt3nkHAPAAA=
+  </data>
+ </layer>
+ <layer name="Interactive" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+2VwQoAIAhDu/X/f9ypS6SpizRx0CFw8zGCWitJ1L0BCHlxrXtPdy9F5filr3pfvDgOhFHr1fT1kuvk9+L6ta9b2RKvJv9lX9m4kLni0s0VFz6H/MVRuXa581gyLVzUTi47CxfnQbkiaQDXLblycA8AAA==
   </data>
  </layer>
 </map>
