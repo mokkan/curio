@@ -8,7 +8,6 @@
 + **[15]** Add "key" item and exit door that can be opened with key
 + **[16]** Add enemies that hunt the player
 + **[17]** Add environmental hazards
-+ **[19]** Add level backgrounds
 
 
 ## Resolved Issues ##
@@ -23,3 +22,4 @@
 + **[9]** Add gravity system
 + **[10]** Add ability for player to jump
 + **[18]** Revise tilemap layering, add new level 1 tileset
++ **[19]** Add level backgrounds
