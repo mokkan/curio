@@ -1,6 +1,14 @@
 ## Open Issues ##
 
 + **[7]** Add loading screen for main game state
++ **[11]** Make ladders climbable
++ **[12]** Create animation system
++ **[13]** Add collectible treasure
++ **[14]** Add item system
++ **[15]** Add "key" item and exit door that can be opened with key
++ **[16]** Add enemies that hunt the player
++ **[17]** Add environmental hazards
++ **[18]** Revise tilemap layering, add new level 1 tileset
 
 
 ## Resolved Issues ##
