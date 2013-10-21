@@ -5,6 +5,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Mapper;
 import com.artemis.systems.IntervalEntityProcessingSystem;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -16,16 +17,28 @@ import com.wasome.curio.components.Velocity;
 
 public class MovementSystem extends IntervalEntityProcessingSystem {
 
-    @Mapper ComponentMapper<Position> positionMapper;
-    @Mapper ComponentMapper<Velocity> velocityMapper;
-    @Mapper ComponentMapper<Size> sizeMapper;
-    @Mapper ComponentMapper<Creature> creatureMapper;
-    TiledMap map;
+    private @Mapper ComponentMapper<Position> positionMapper;
+    private @Mapper ComponentMapper<Velocity> velocityMapper;
+    private @Mapper ComponentMapper<Size> sizeMapper;
+    private @Mapper ComponentMapper<Creature> creatureMapper;
+    private TiledMapTileLayer terrainLayer;
+    private TiledMapTileLayer interactiveLayer;
+    private int tileWidth;
+    private int tileHeight;
+    
     
     @SuppressWarnings("unchecked")
     public MovementSystem(TiledMap map) {
         super(Aspect.getAspectForAll(Velocity.class, Position.class), 10);
-        this.map = map;
+        
+        // Get the layers of the map
+        MapLayers layers = map.getLayers();
+        terrainLayer = (TiledMapTileLayer) layers.get("Terrain");
+        interactiveLayer = (TiledMapTileLayer) layers.get("Interactive");
+        
+        // Get the tile dimensions
+        tileWidth = (int) terrainLayer.getTileWidth();
+        tileHeight = (int) terrainLayer.getTileHeight();
     }
 
     @Override
@@ -74,21 +87,20 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     }
     
     private boolean checkLeftCollisions(Entity e) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
         
         float bbx1 = pos.getX() - (size.getWidth() / 2);
         float bby1 = pos.getY() - (size.getHeight() / 2);
         float bby2 = pos.getY() + (size.getHeight() / 2);
-        
-        int tileL = (int) (bbx1 / layer.getTileWidth());
-        int tileBot = (int) (bby1 / layer.getTileHeight());
-        int tileTop = (int) ((bby2 - 1) / layer.getTileHeight());
+
+        int tileL = (int) (bbx1 / tileWidth);
+        int tileBot = (int) (bby1 / tileHeight);
+        int tileTop = (int) ((bby2 - 1) / tileHeight);
         
         for (int y = tileBot; y <= tileTop; y++) {
 
-            if (isCellSolid(layer.getCell(tileL, y))) {
+            if (isCellSolid(tileL, y)) {
                 return true;
             }
         }
@@ -97,7 +109,6 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     }
     
     private boolean checkRightCollisions(Entity e) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
 
@@ -105,12 +116,12 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bby1 = pos.getY() - (size.getHeight() / 2);
         float bby2 = pos.getY() + (size.getHeight() / 2);
 
-        int tileR = (int) ((bbx2 - 1) / layer.getTileWidth());
-        int tileBot = (int) (bby1 / layer.getTileHeight());
-        int tileTop = (int) ((bby2 - 1) / layer.getTileHeight());
+        int tileR = (int) ((bbx2 - 1) / tileWidth);
+        int tileBot = (int) (bby1 / tileHeight);
+        int tileTop = (int) ((bby2 - 1) / tileHeight);
         
         for (int y = tileBot; y <= tileTop; y++) {
-            if (isCellSolid(layer.getCell(tileR, y))) {
+            if (isCellSolid(tileR, y)) {
                 return true;
             }
         }
@@ -119,7 +130,6 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     }
     
     private boolean checkBottomCollisions(Entity e) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
         
@@ -127,12 +137,12 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bbx2 = pos.getX() + (size.getWidth() / 2);
         float bby1 = pos.getY() - (size.getHeight() / 2);
         
-        int tileL = (int) (bbx1 / layer.getTileWidth());
-        int tileR = (int) ((bbx2 - 1) / layer.getTileWidth());
-        int tileBot = (int) (bby1 / layer.getTileHeight());
+        int tileL = (int) (bbx1 / tileWidth);
+        int tileR = (int) ((bbx2 - 1) / tileWidth);
+        int tileBot = (int) (bby1 / tileHeight);
         
         for (int x = tileL; x <= tileR; x++) {
-            if (isCellSolid(layer.getCell(x, tileBot))) {
+            if (isCellSolid(x, tileBot)) {
                 return true;
             }
         }
@@ -141,7 +151,6 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     }
     
     private boolean checkTopCollisions(Entity e) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
         
@@ -149,12 +158,12 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bbx2 = pos.getX() + (size.getWidth() / 2);
         float bby2 = pos.getY() + (size.getHeight() / 2);
         
-        int tileL = (int) (bbx1 / layer.getTileWidth());
-        int tileR = (int) ((bbx2 - 1) / layer.getTileWidth());
-        int tileTop = (int) ((bby2 - 1) / layer.getTileHeight());
+        int tileL = (int) (bbx1 / tileWidth);
+        int tileR = (int) ((bbx2 - 1) / tileWidth);
+        int tileTop = (int) ((bby2 - 1) / tileHeight);
         
         for (int x = tileL; x <= tileR; x++) {
-            if (isCellSolid(layer.getCell(x, tileTop))) {
+            if (isCellSolid(x, tileTop)) {
                 return true;
             }
         }
@@ -162,14 +171,25 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         return false;
     }
     
-    private boolean isCellSolid(Cell cell) {
-        if (cell == null) {
-            return false;
+    private boolean isCellSolid(int x, int y) {
+        Cell terrainCell = terrainLayer.getCell(x, y);
+        Cell interactiveCell = interactiveLayer.getCell(x, y);
+        
+        // If there's a ladder, the tile is not considered solid
+        if (interactiveCell != null) {
+            TiledMapTile interactiveTile = interactiveCell.getTile();
+            if (interactiveTile.getProperties().containsKey("ladder")) {
+                return false;
+            }
         }
         
-        TiledMapTile tile = cell.getTile();
+        // If we get here, there was no ladder, so check if terrain is solid
+        if (terrainCell != null) {
+            TiledMapTile terrainTile = terrainCell.getTile();
+            return terrainTile.getProperties().containsKey("solid");
+        }
         
-        return tile.getProperties().containsKey("solid");
+        return false;
     }
 
 }
