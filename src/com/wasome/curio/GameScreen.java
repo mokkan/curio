@@ -10,6 +10,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -29,6 +31,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera cam;
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
+    private Texture background;
     private World world;
     private RenderingSystem renderingSystem;
     private InputSystem inputSystem;
@@ -52,6 +55,12 @@ public class GameScreen implements Screen {
         assetManager.finishLoading();
         map = assetManager.get("assets/levels/level1.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
+        
+        // Load background
+        String bgFile = map.getProperties().get("background").toString();
+        assetManager.load("assets/backgrounds/" + bgFile, Texture.class);
+        assetManager.finishLoading();
+        background = assetManager.get("assets/backgrounds/" + bgFile);
 
         // Create camera
         zoomFactor = Gdx.graphics.getHeight() /  gameHeight;
@@ -117,9 +126,15 @@ public class GameScreen implements Screen {
         // Translate for drawing maps and entities
         cam.translate(-16, -48);
         cam.update();
+        mapRenderer.setView(cam);
+        
+        // Draw level background
+        SpriteBatch b = mapRenderer.getSpriteBatch();
+        b.begin();
+        b.draw(background, 0, 0);
+        b.end();
         
         // Draw map
-        mapRenderer.setView(cam);
         mapRenderer.render();
         
         // Draw entities
