@@ -30,11 +30,15 @@ public class GameScreen implements Screen {
     private AssetManager assetManager;
     private OrthographicCamera cam;
     private OrthogonalTiledMapRenderer mapRenderer;
+    private SpriteBatch batch;
     private TiledMap map;
+    private Texture uiBg;
     private Texture levelBg;
     private World world;
     private RenderingSystem renderingSystem;
     private InputSystem inputSystem;
+    private int uiBgWidth;
+    private int uiBgHeight;
     private int camWidth;
     private int camHeight;
     private int zoomFactor;
@@ -49,6 +53,14 @@ public class GameScreen implements Screen {
                 TiledMap.class,
                 new TmxMapLoader(new InternalFileHandleResolver())
         );
+        
+        // Load interface background
+        String uiBgFile = "assets/ui/background.png";
+        assetManager.load(uiBgFile, Texture.class);
+        assetManager.finishLoading();
+        uiBg = assetManager.get(uiBgFile, Texture.class);
+        uiBgWidth = uiBg.getWidth();
+        uiBgHeight = uiBg.getHeight();
         
         // Load level 1
         assetManager.load("assets/levels/level1.tmx", TiledMap.class);
@@ -69,6 +81,9 @@ public class GameScreen implements Screen {
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, camWidth, camHeight);
+        
+        // Create sprite batch
+        batch = new SpriteBatch();
 
         // Set up entity system
         inputSystem = new InputSystem();
@@ -113,8 +128,17 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         
-        // Draw screen background
-        // ... TODO
+        // Draw the interface background
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+        
+        for (int y = 0; y < Gdx.graphics.getHeight(); y += uiBgHeight) {
+            for (int x = 0; x < Gdx.graphics.getWidth(); x += uiBgWidth) {
+                batch.draw(uiBg, x, y);
+            }
+        }
+        
+        batch.end();
         
         // Draw the UI
         int horizTrans = (camWidth - gameWidth) / 2;
@@ -129,10 +153,10 @@ public class GameScreen implements Screen {
         mapRenderer.setView(cam);
         
         // Draw level background
-        SpriteBatch b = mapRenderer.getSpriteBatch();
-        b.begin();
-        b.draw(levelBg, 0, 0);
-        b.end();
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+        batch.draw(levelBg, 0, 0);
+        batch.end();
         
         // Draw map
         mapRenderer.render();
