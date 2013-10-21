@@ -8,6 +8,8 @@
 + **[15]** Add "key" item and exit door that can be opened with key
 + **[16]** Add enemies that hunt the player
 + **[17]** Add environmental hazards
++ **[20]** Add "dead space" background
++ **[21]** Add border around play field
 
 
 ## Resolved Issues ##
