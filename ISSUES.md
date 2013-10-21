@@ -8,6 +8,7 @@
 + **[15]** Add "key" item and exit door that can be opened with key
 + **[16]** Add enemies that hunt the player
 + **[17]** Add environmental hazards
++ **[19]** Add level backgrounds
 
 
 ## Resolved Issues ##
