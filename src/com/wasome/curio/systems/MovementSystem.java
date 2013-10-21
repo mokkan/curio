@@ -88,7 +88,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         
         for (int y = tileBot; y <= tileTop; y++) {
 
-            if (isCellCollidable(layer.getCell(tileL, y))) {
+            if (isCellSolid(layer.getCell(tileL, y))) {
                 return true;
             }
         }
@@ -110,7 +110,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         int tileTop = (int) ((bby2 - 1) / layer.getTileHeight());
         
         for (int y = tileBot; y <= tileTop; y++) {
-            if (isCellCollidable(layer.getCell(tileR, y))) {
+            if (isCellSolid(layer.getCell(tileR, y))) {
                 return true;
             }
         }
@@ -132,7 +132,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         int tileBot = (int) (bby1 / layer.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            if (isCellCollidable(layer.getCell(x, tileBot))) {
+            if (isCellSolid(layer.getCell(x, tileBot))) {
                 return true;
             }
         }
@@ -154,7 +154,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         int tileTop = (int) ((bby2 - 1) / layer.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            if (isCellCollidable(layer.getCell(x, tileTop))) {
+            if (isCellSolid(layer.getCell(x, tileTop))) {
                 return true;
             }
         }
@@ -162,14 +162,14 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         return false;
     }
     
-    private boolean isCellCollidable(Cell cell) {
+    private boolean isCellSolid(Cell cell) {
         if (cell == null) {
             return false;
         }
         
         TiledMapTile tile = cell.getTile();
         
-        return tile.getProperties().containsKey("collidable");
+        return tile.getProperties().containsKey("solid");
     }
 
 }

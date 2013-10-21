@@ -3,7 +3,7 @@
  <image source="basic.png" width="32" height="16"/>
  <tile id="0">
   <properties>
-   <property name="collidable" value=""/>
+   <property name="solid" value=""/>
   </properties>
  </tile>
 </tileset>
