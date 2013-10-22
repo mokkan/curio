@@ -5,11 +5,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Mapper;
 import com.artemis.systems.IntervalEntityProcessingSystem;
-import com.badlogic.gdx.maps.MapLayers;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.wasome.curio.Level;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
@@ -21,24 +17,13 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     private @Mapper ComponentMapper<Velocity> velocityMapper;
     private @Mapper ComponentMapper<Size> sizeMapper;
     private @Mapper ComponentMapper<Creature> creatureMapper;
-    private TiledMapTileLayer terrainLayer;
-    private TiledMapTileLayer interactiveLayer;
-    private int tileWidth;
-    private int tileHeight;
+    private Level level;
     
     
     @SuppressWarnings("unchecked")
-    public MovementSystem(TiledMap map) {
+    public MovementSystem(Level level) {
         super(Aspect.getAspectForAll(Velocity.class, Position.class), 10);
-        
-        // Get the layers of the map
-        MapLayers layers = map.getLayers();
-        terrainLayer = (TiledMapTileLayer) layers.get("Terrain");
-        interactiveLayer = (TiledMapTileLayer) layers.get("Interactive");
-        
-        // Get the tile dimensions
-        tileWidth = (int) terrainLayer.getTileWidth();
-        tileHeight = (int) terrainLayer.getTileHeight();
+        this.level = level;
     }
 
     @Override
@@ -94,13 +79,13 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bby1 = pos.getY() - (size.getHeight() / 2);
         float bby2 = pos.getY() + (size.getHeight() / 2);
 
-        int tileL = (int) (bbx1 / tileWidth);
-        int tileBot = (int) (bby1 / tileHeight);
-        int tileTop = (int) ((bby2 - 1) / tileHeight);
+        int tileL = (int) (bbx1 / level.getTileWidth());
+        int tileBot = (int) (bby1 / level.getTileHeight());
+        int tileTop = (int) ((bby2 - 1) / level.getTileHeight());
         
         for (int y = tileBot; y <= tileTop; y++) {
 
-            if (isCellSolid(tileL, y)) {
+            if (level.isCellSolid(tileL, y)) {
                 return true;
             }
         }
@@ -116,12 +101,12 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bby1 = pos.getY() - (size.getHeight() / 2);
         float bby2 = pos.getY() + (size.getHeight() / 2);
 
-        int tileR = (int) ((bbx2 - 1) / tileWidth);
-        int tileBot = (int) (bby1 / tileHeight);
-        int tileTop = (int) ((bby2 - 1) / tileHeight);
+        int tileR = (int) ((bbx2 - 1) / level.getTileWidth());
+        int tileBot = (int) (bby1 / level.getTileHeight());
+        int tileTop = (int) ((bby2 - 1) / level.getTileHeight());
         
         for (int y = tileBot; y <= tileTop; y++) {
-            if (isCellSolid(tileR, y)) {
+            if (level.isCellSolid(tileR, y)) {
                 return true;
             }
         }
@@ -137,12 +122,12 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bbx2 = pos.getX() + (size.getWidth() / 2);
         float bby1 = pos.getY() - (size.getHeight() / 2);
         
-        int tileL = (int) (bbx1 / tileWidth);
-        int tileR = (int) ((bbx2 - 1) / tileWidth);
-        int tileBot = (int) (bby1 / tileHeight);
+        int tileL = (int) (bbx1 / level.getTileWidth());
+        int tileR = (int) ((bbx2 - 1) / level.getTileWidth());
+        int tileBot = (int) (bby1 / level.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            if (isCellSolid(x, tileBot)) {
+            if (level.isCellSolid(x, tileBot)) {
                 return true;
             }
         }
@@ -158,35 +143,14 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         float bbx2 = pos.getX() + (size.getWidth() / 2);
         float bby2 = pos.getY() + (size.getHeight() / 2);
         
-        int tileL = (int) (bbx1 / tileWidth);
-        int tileR = (int) ((bbx2 - 1) / tileWidth);
-        int tileTop = (int) ((bby2 - 1) / tileHeight);
+        int tileL = (int) (bbx1 / level.getTileWidth());
+        int tileR = (int) ((bbx2 - 1) / level.getTileWidth());
+        int tileTop = (int) ((bby2 - 1) / level.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            if (isCellSolid(x, tileTop)) {
+            if (level.isCellSolid(x, tileTop)) {
                 return true;
             }
-        }
-        
-        return false;
-    }
-    
-    private boolean isCellSolid(int x, int y) {
-        Cell terrainCell = terrainLayer.getCell(x, y);
-        Cell interactiveCell = interactiveLayer.getCell(x, y);
-        
-        // If there's a ladder, the tile is not considered solid
-        if (interactiveCell != null) {
-            TiledMapTile interactiveTile = interactiveCell.getTile();
-            if (interactiveTile.getProperties().containsKey("ladder")) {
-                return false;
-            }
-        }
-        
-        // If we get here, there was no ladder, so check if terrain is solid
-        if (terrainCell != null) {
-            TiledMapTile terrainTile = terrainCell.getTile();
-            return terrainTile.getProperties().containsKey("solid");
         }
         
         return false;

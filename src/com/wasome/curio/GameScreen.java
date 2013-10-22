@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Position;
@@ -29,14 +28,13 @@ public class GameScreen implements Screen {
     
     private AssetManager assetManager;
     private OrthographicCamera cam;
-    private OrthogonalTiledMapRenderer mapRenderer;
     private SpriteBatch batch;
-    private TiledMap map;
     private Texture uiBg;
     private Texture levelBg;
     private World world;
     private RenderingSystem renderingSystem;
     private InputSystem inputSystem;
+    private Level level;
     private int uiBgWidth;
     private int uiBgHeight;
     private int camWidth;
@@ -63,13 +61,13 @@ public class GameScreen implements Screen {
         uiBgHeight = uiBg.getHeight();
         
         // Load level 1
-        assetManager.load("assets/levels/level1.tmx", TiledMap.class);
+        String levelFile = "assets/levels/level1.tmx";
+        assetManager.load(levelFile, TiledMap.class);
         assetManager.finishLoading();
-        map = assetManager.get("assets/levels/level1.tmx");
-        mapRenderer = new OrthogonalTiledMapRenderer(map, 1);
-        
+        level = new Level((TiledMap) assetManager.get(levelFile));
+
         // Load background
-        String bgFile = map.getProperties().get("background").toString();
+        String bgFile = level.getBackground();
         assetManager.load("assets/backgrounds/" + bgFile, Texture.class);
         assetManager.finishLoading();
         levelBg = assetManager.get("assets/backgrounds/" + bgFile);
@@ -96,7 +94,7 @@ public class GameScreen implements Screen {
         
         world.setSystem(renderingSystem);
         world.setSystem(inputSystem);
-        world.setSystem(new MovementSystem(map));
+        world.setSystem(new MovementSystem(level));
         world.setSystem(new GravitySystem());
         
         world.initialize();
@@ -150,16 +148,15 @@ public class GameScreen implements Screen {
         // Translate for drawing maps and entities
         cam.translate(-16, -48);
         cam.update();
-        mapRenderer.setView(cam);
-        
+
         // Draw level background
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
         batch.draw(levelBg, 0, 0);
         batch.end();
         
-        // Draw map
-        mapRenderer.render();
+        // Draw level map
+        level.render(cam);
         
         // Draw entities
         renderingSystem.process();
