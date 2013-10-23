@@ -1,7 +1,6 @@
 ## Open Issues ##
 
 + **[7]** Add loading screen for main game state
-+ **[11]** Make ladders climbable
 + **[12]** Create animation system
 + **[13]** Add collectible treasure
 + **[14]** Add item system
@@ -22,6 +21,7 @@
 + **[8]** Constrain player movement to horizontal axis
 + **[9]** Add gravity system
 + **[10]** Add ability for player to jump
++ **[11]** Make ladders climbable
 + **[18]** Revise tilemap layering, add new level 1 tileset
 + **[19]** Add level backgrounds
 + **[20]** Add "dead space" background
