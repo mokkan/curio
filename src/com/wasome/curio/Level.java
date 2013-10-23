@@ -55,7 +55,16 @@ public class Level {
     }
     
     public boolean isCellSolid(int x, int y) {
+        
         Cell terrainCell = terrainLayer.getCell(x, y);
+        
+        if (terrainCell == null) {
+            return false;
+        }
+        
+        TiledMapTile interactiveCell = terrainCell.getTile();
+        return interactiveCell.getProperties().containsKey("solid");
+        /*
 
         // If there's a ladder, the tile is not considered solid
         if (isCellLadder(x, y)) {
@@ -69,6 +78,7 @@ public class Level {
         }
         
         return false;
+        */
     }
     
     public boolean isCellLadder(int x, int y) {

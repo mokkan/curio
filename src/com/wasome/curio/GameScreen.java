@@ -84,7 +84,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Set up entity system
-        inputSystem = new InputSystem();
+        inputSystem = new InputSystem(level);
         renderingSystem = new RenderingSystem(cam);
         
         world = new World();

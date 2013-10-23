@@ -30,7 +30,6 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     protected void process(Entity e) {
         Position pos = positionMapper.get(e);
         Velocity vel = velocityMapper.get(e);
-        Creature creature = creatureMapper.get(e);
         
         float oldX = pos.getX(), oldY = pos.getY();
         boolean collisionX = false, collisionY = false;
@@ -60,14 +59,53 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
             vel.setY(0);
         }
         
-        if (vel.getY() != 0) {
-            creature.setStatus(Creature.STATUS_JUMPING);
-        } else {
-            if (vel.getX() != 0) {
-                creature.setStatus(Creature.STATUS_WALKING);
-            } else {
+        // Set the status of the creature
+        updateStatus(e);
+    }
+    
+    private void updateStatus(Entity e) {
+        Position pos = positionMapper.get(e);
+        Velocity vel = velocityMapper.get(e);
+        Size size = sizeMapper.get(e);
+        Creature creature = creatureMapper.get(e);
+        
+        float bbx1 = pos.getX() - (size.getWidth() / 2);
+        float bbx2 = pos.getX() + (size.getWidth() / 2);
+        float bby1 = pos.getY() - (size.getHeight() / 2);
+
+        int tileX = (int) pos.getX() / level.getTileWidth();
+        int tileL = (int) (bbx1 / level.getTileWidth());
+        int tileR = (int) ((bbx2 - 1) / level.getTileWidth());
+        int tileBot = (int) (bby1 / level.getTileHeight());
+        
+        int status = creature.getStatus();
+
+        // Check for idle/walking status
+        if ((level.isCellSolid(tileL, tileBot-1)
+                || level.isCellSolid(tileR, tileBot-1))
+                && vel.getY() == 0 && status != Creature.STATUS_CLIMBING) {
+            
+            if (vel.getX() == 0) {
                 creature.setStatus(Creature.STATUS_IDLE);
+            } else {
+                creature.setStatus(Creature.STATUS_WALKING);
             }
+        }
+        
+        // Check for jumping status
+        if ((status == Creature.STATUS_CLIMBING && vel.getX() != 0)
+                || (status != Creature.STATUS_CLIMBING && vel.getY() != 0)) {
+            
+            creature.setStatus(Creature.STATUS_JUMPING);
+        }
+        
+        // Check for transition between climbing and idle
+        if (status == Creature.STATUS_CLIMBING
+                && !level.isCellLadder(tileX, tileBot)) {
+            
+            creature.setStatus(Creature.STATUS_IDLE);
+            pos.setY((tileBot+1) * level.getTileHeight() - size.getHeight()/2);
+            vel.setY(0);
         }
     }
     
@@ -84,7 +122,6 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         int tileTop = (int) ((bby2 - 1) / level.getTileHeight());
         
         for (int y = tileBot; y <= tileTop; y++) {
-
             if (level.isCellSolid(tileL, y)) {
                 return true;
             }
@@ -117,6 +154,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     private boolean checkBottomCollisions(Entity e) {
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
+        Creature creature = creatureMapper.get(e);
         
         float bbx1 = pos.getX() - (size.getWidth() / 2);
         float bbx2 = pos.getX() + (size.getWidth() / 2);
@@ -127,7 +165,18 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         int tileBot = (int) (bby1 / level.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            if (level.isCellSolid(x, tileBot)) {
+            
+            // Split these cases up to make more readable. Top case is test for
+            // when ladders are present (allows for climbing). Second case is
+            // when there is no ladder (standard case).
+            if (level.isCellSolid(x, tileBot) && level.isCellLadder(x, tileBot)
+                    && bby1 >= (tileBot+1) * level.getTileHeight() - 1
+                    && creature.getStatus() != Creature.STATUS_CLIMBING) {
+                
+                return true;
+            } else if (level.isCellSolid(x, tileBot)
+                    && !level.isCellLadder(x, tileBot)) {
+                
                 return true;
             }
         }
@@ -138,6 +187,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     private boolean checkTopCollisions(Entity e) {
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
+        Creature creature = creatureMapper.get(e);
         
         float bbx1 = pos.getX() - (size.getWidth() / 2);
         float bbx2 = pos.getX() + (size.getWidth() / 2);
@@ -148,7 +198,10 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         int tileTop = (int) ((bby2 - 1) / level.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            if (level.isCellSolid(x, tileTop)) {
+            if (level.isCellSolid(x, tileTop)
+                    && !(level.isCellLadder(x, tileTop)
+                         && creature.getStatus() == Creature.STATUS_CLIMBING)) {
+                
                 return true;
             }
         }

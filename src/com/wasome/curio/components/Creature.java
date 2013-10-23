@@ -8,7 +8,7 @@ public class Creature extends Component {
     public static final int STATUS_WALKING = 2;
     public static final int STATUS_JUMPING = 3;
     public static final int STATUS_CLIMBING = 4;
-    
+
     private int status;
     
     public Creature() {
