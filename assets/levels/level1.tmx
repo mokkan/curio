@@ -6,12 +6,12 @@
  <tileset firstgid="1" source="../tilesets/cavern.tsx"/>
  <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2WSw6AIAxEK27EjXoA4f63tMY00SrKLwLKJG+BCzIZ2wkSAMbMkEgP+amD6muvGVGINpxrXkfVvNxUcl5rh6kA9OnWZ5WcV50ve73li/KwndW/5+Uqm57w6YEYvnLNK6WvBhFIy76n9kVzxD3E8MU7wGUeB9je89ONL965KZX6P5r0ZV+0UwTfLR/RPogA5AUh9xELNt3nkHAPAAA=
+   H4sIAAAAAAAAA+2WwQqAIBBEN7tkBBWdq///y5QQZNPU3NJgB+bSYXuM45YEgKkyS+Ue6lMHzGVrVd4c3gtzhcR5pYnzSpPm0jvMxR7r/TI1rD/nxf2K11dcvnx85u92mkJ7QsCzPUDBdZfX8BUIUohrefn9DZxn0qLnpftleoQZKLhcOyC2kyOc//PzDZeZX6LnWKXP0adcLp0x7iyFKPLSM4RlCk5zH0SGpcM584wP0N0pSHAPAAA=
   </data>
  </layer>
  <layer name="Interactive" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2VwQoAIAhDu/X/f9ypS6SpizRx0CFw8zGCWitJ1L0BCHlxrXtPdy9F5filr3pfvDgOhFHr1fT1kuvk9+L6ta9b2RKvJv9lX9m4kLni0s0VFz6H/MVRuXa581gyLVzUTi47CxfnQbkiaQDXLblycA8AAA==
+   H4sIAAAAAAAAA+2VwQoAIAhDu/n/f9w1IqWxQMM9CCI2eZ4aQwgeyxZwkBeGvDAiL8aZ3Vde7/pdvZD55txROnoxOXlhOXnxub3zm5ctJ5p7ymR7ef3bf6KqV/TOelViAiolhHlwDwAA
   </data>
  </layer>
 </map>
