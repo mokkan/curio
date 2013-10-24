@@ -6,6 +6,7 @@ import com.artemis.Entity;
 import com.artemis.annotations.Mapper;
 import com.artemis.systems.IntervalEntityProcessingSystem;
 import com.wasome.curio.Level;
+import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
@@ -17,6 +18,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     private @Mapper ComponentMapper<Velocity> velocityMapper;
     private @Mapper ComponentMapper<Size> sizeMapper;
     private @Mapper ComponentMapper<Creature> creatureMapper;
+    private @Mapper ComponentMapper<Appearance> appearanceMapper;
     private Level level;
     
     
@@ -30,7 +32,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
     protected void process(Entity e) {
         Position pos = positionMapper.get(e);
         Velocity vel = velocityMapper.get(e);
-        
+
         float oldX = pos.getX(), oldY = pos.getY();
         boolean collisionX = false, collisionY = false;
         
@@ -68,6 +70,7 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
         Velocity vel = velocityMapper.get(e);
         Size size = sizeMapper.get(e);
         Creature creature = creatureMapper.get(e);
+        Appearance appearance = appearanceMapper.get(e);
         
         float bbx1 = pos.getX() - (size.getWidth() / 2);
         float bbx2 = pos.getX() + (size.getWidth() / 2);
@@ -106,6 +109,11 @@ public class MovementSystem extends IntervalEntityProcessingSystem {
             creature.setStatus(Creature.STATUS_IDLE);
             pos.setY((tileBot+1) * level.getTileHeight() - size.getHeight()/2);
             vel.setY(0);
+        }
+        
+        // Update appearance
+        if (status != creature.getStatus()) {
+            appearance.setAnimation(creature.getCurrentAnimation());
         }
     }
     
