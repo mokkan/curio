@@ -1,5 +1,8 @@
 package com.wasome.curio;
 
+import sprites.Animation;
+import sprites.AnimationLoader;
+
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
@@ -50,6 +53,12 @@ public class GameScreen implements Screen {
         assetManager.setLoader(
                 TiledMap.class,
                 new TmxMapLoader(new InternalFileHandleResolver())
+        );
+        
+        // Set the animation loader
+        assetManager.setLoader(
+                Animation.class,
+                new AnimationLoader(new InternalFileHandleResolver())
         );
         
         // Load interface background
