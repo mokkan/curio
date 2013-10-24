@@ -25,6 +25,7 @@ public class Curio extends Game {
         cfg.height = 960;
         cfg.useGL20 = false;
         cfg.resizable = false;
+        cfg.vSyncEnabled = true;
         new LwjglApplication(new Curio(), cfg);
     }
 
