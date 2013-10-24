@@ -1,8 +1,5 @@
 package com.wasome.curio;
 
-import sprites.Animation;
-import sprites.AnimationLoader;
-
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
@@ -22,6 +19,8 @@ import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Velocity;
+import com.wasome.curio.sprites.Animation;
+import com.wasome.curio.sprites.AnimationLoader;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
