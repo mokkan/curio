@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Position;
@@ -21,6 +22,7 @@ import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Velocity;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationLoader;
+import com.wasome.curio.sprites.AnimationState;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -59,6 +61,13 @@ public class GameScreen implements Screen {
                 Animation.class,
                 new AnimationLoader(new InternalFileHandleResolver())
         );
+        
+        // Load the animations
+        assetManager.load("assets/sprites/imp-idle.anim", Animation.class);
+        assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
+        assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
+        assetManager.load("assets/sprites/imp-climb.anim", Animation.class);
+        assetManager.finishLoading();
         
         // Load interface background
         String uiBgFile = "assets/ui/background.png";
@@ -113,12 +122,57 @@ public class GameScreen implements Screen {
     }
     
     private void initPlayer() {
+        // Create creature for player
+        Creature creature = new Creature();
+       
+        creature.setAnimation(
+                Creature.STATUS_IDLE,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-idle.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_WALKING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-walk.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_JUMPING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-jump.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_CLIMBING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-climb.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+
+        // Create appearance for entity
         Entity e = world.createEntity();
         e.addComponent(new Position(136, 136));
         e.addComponent(new Size(16, 16));
         e.addComponent(new Velocity(0, 0));
         e.addComponent(new Gravity(-3.0f, -0.25f));
-        e.addComponent(new Creature());
+        e.addComponent(creature);
+        e.addComponent(new Appearance(null));
         
         world.getManager(TagManager.class).register("PLAYER", e);
         world.addEntity(e);
