@@ -9,6 +9,7 @@ public class AnimationState {
     private int currentFrame = 0;
     private float time = 0;
     private boolean reversed = false;
+    private boolean paused = false;
     
     public AnimationState(Animation anim, boolean hflip, boolean vflip,
             boolean reversed) {
@@ -19,12 +20,36 @@ public class AnimationState {
         frames = anim.getFrames().toArray(new Frame[anim.getFrames().size()]);
         time = frames[0].getTime();
         
+        flip(hflip, vflip);
+    }
+    
+    public void flip(boolean hflip, boolean vflip) {
         for (int i = 0; i < frames.length; i++) {
             frames[i].getTextureRegion().flip(hflip, vflip);
         }
     }
     
+    public void pause() {
+        paused = true;
+    }
+    
+    public void resume() {
+        paused = false;
+    }
+    
+    public boolean isPaused() {
+        return paused;
+    }
+    
+    public void reset() {
+        currentFrame = 0;
+    }
+    
     public void update(float dt) {
+        if (paused) {
+            return;
+        }
+        
         while (dt > time) {
             dt -= time;
             
