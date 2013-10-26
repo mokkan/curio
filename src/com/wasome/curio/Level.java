@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 public class Level {
     
+    private static final int[] renderLayers = {0, 1};
     private OrthogonalTiledMapRenderer renderer;
     private TiledMap map;
     private TiledMapTileLayer terrainLayer;
@@ -51,7 +52,7 @@ public class Level {
     
     public void render(OrthographicCamera cam) {
         renderer.setView(cam);
-        renderer.render();
+        renderer.render(renderLayers);
     }
     
     public boolean isCellSolid(int x, int y) {
