@@ -7,10 +7,13 @@ import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.BitmapFontLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -33,6 +36,8 @@ public class GameScreen implements Screen {
     private AssetManager assetManager;
     private OrthographicCamera cam;
     private SpriteBatch batch;
+    private BitmapFont font;
+    private TextBounds fontBounds;
     private Texture uiBg;
     private Texture levelBg;
     private World world;
@@ -44,6 +49,7 @@ public class GameScreen implements Screen {
     private int camWidth;
     private int camHeight;
     private int zoomFactor;
+    private int score = 0;
     final protected static int gameWidth = 640;
     final protected static int gameHeight = 480;
 
@@ -62,6 +68,18 @@ public class GameScreen implements Screen {
                 new AnimationLoader(new InternalFileHandleResolver())
         );
         
+        // Set the font loader
+        assetManager.setLoader(
+                BitmapFont.class,
+                new BitmapFontLoader(new InternalFileHandleResolver())
+        );
+        
+        // Load the font
+        String fontFile = "assets/fonts/yacimiento.fnt";
+        assetManager.load(fontFile, BitmapFont.class);
+        assetManager.finishLoading();
+        font = assetManager.get(fontFile, BitmapFont.class);
+
         // Load the animations
         assetManager.load("assets/sprites/imp-idle.anim", Animation.class);
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
@@ -206,6 +224,15 @@ public class GameScreen implements Screen {
         
         cam.translate(-horizTrans, -vertTrans);
         cam.update();
+        
+        String scoreStr = "Haul: $" + Integer.toString(score);
+        font.getBounds(scoreStr);
+        fontBounds = font.getBounds(scoreStr);
+        
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+        font.draw(batch, scoreStr, (gameWidth / 2) - fontBounds.width - 16, 32);
+        batch.end();
         
         // Translate for drawing maps and entities
         cam.translate(-16, -48);
