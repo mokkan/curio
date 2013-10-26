@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 
 public class Level {
     
@@ -15,6 +16,7 @@ public class Level {
     private TiledMap map;
     private TiledMapTileLayer terrainLayer;
     private TiledMapTileLayer interactiveLayer;
+    private TiledMapTileLayer entitiesLayer;
     private int tileWidth;
     private int tileHeight;
     
@@ -34,6 +36,32 @@ public class Level {
         return map.getProperties().get("background").toString();
     }
     
+    public Vector2 getPlayerSpawn() {
+        if (entitiesLayer == null) {
+            return null;
+        }
+        
+        Cell cell;
+        TiledMapTile tile;
+        
+        for (int y = 0; y < entitiesLayer.getHeight(); y++) {
+            for (int x = 0; x < entitiesLayer.getWidth(); x++) {
+                cell = entitiesLayer.getCell(x, y);
+                if (cell == null) {
+                    continue;
+                }
+                
+                tile = cell.getTile();
+                
+                if (tile.getProperties().containsKey("player")) {
+                    return new Vector2(x * tileWidth, y * tileHeight);
+                }
+            }
+        }
+        
+        return null;
+    }
+    
     public void setMap(TiledMap map) {
         this.map = map;
         
@@ -44,6 +72,7 @@ public class Level {
         MapLayers layers = map.getLayers();
         terrainLayer = (TiledMapTileLayer) layers.get("Terrain");
         interactiveLayer = (TiledMapTileLayer) layers.get("Interactive");
+        entitiesLayer = (TiledMapTileLayer) layers.get("Entities");
         
         // Get the tile dimensions
         tileWidth = (int) terrainLayer.getTileWidth();

@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Vector2;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Gravity;
@@ -140,6 +141,12 @@ public class GameScreen implements Screen {
     }
     
     private void initPlayer() {
+        // Get the spawn location
+        Vector2 spawn = level.getPlayerSpawn();
+        if (spawn == null) {
+            spawn = new Vector2(0, 0);
+        }
+        
         // Create creature for player
         Creature creature = new Creature();
        
@@ -182,15 +189,22 @@ public class GameScreen implements Screen {
                         ), false, false, false
                 )
         );
+        
+        // Create size and position components
+        Size size = new Size(16, 16);
+        Position pos = new Position(
+            spawn.x + size.getWidth()/2,
+            spawn.y + size.getHeight()/2
+        );
 
-        // Create appearance for entity
+        // Create entity and add components
         Entity e = world.createEntity();
-        e.addComponent(new Position(136, 136));
-        e.addComponent(new Size(16, 16));
+        e.addComponent(pos);
+        e.addComponent(size);
         e.addComponent(new Velocity(0, 0));
         e.addComponent(new Gravity(-3.0f, -0.25f));
         e.addComponent(creature);
-        e.addComponent(new Appearance(null));
+        e.addComponent(new Appearance(creature.getCurrentAnimation()));
         
         world.getManager(TagManager.class).register("PLAYER", e);
         world.addEntity(e);
