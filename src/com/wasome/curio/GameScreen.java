@@ -1,6 +1,5 @@
 package com.wasome.curio;
 
-import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
@@ -17,16 +16,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.math.Vector2;
-import com.wasome.curio.components.Appearance;
-import com.wasome.curio.components.Creature;
-import com.wasome.curio.components.Gravity;
-import com.wasome.curio.components.Position;
-import com.wasome.curio.components.Size;
-import com.wasome.curio.components.Velocity;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationLoader;
-import com.wasome.curio.sprites.AnimationState;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -82,6 +73,7 @@ public class GameScreen implements Screen {
         font = assetManager.get(fontFile, BitmapFont.class);
 
         // Load the animations
+        assetManager.load("assets/sprites/coin.anim", Animation.class);
         assetManager.load("assets/sprites/imp-idle.anim", Animation.class);
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
         assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
@@ -100,7 +92,7 @@ public class GameScreen implements Screen {
         String levelFile = "assets/levels/level1.tmx";
         assetManager.load(levelFile, TiledMap.class);
         assetManager.finishLoading();
-        level = new Level((TiledMap) assetManager.get(levelFile));
+        level = new Level((TiledMap) assetManager.get(levelFile), assetManager);
 
         // Load background
         String bgFile = level.getBackground();
@@ -135,79 +127,10 @@ public class GameScreen implements Screen {
         
         world.initialize();
         
-        initPlayer();
-        
         Gdx.input.setInputProcessor(inputSystem);
-    }
-    
-    private void initPlayer() {
-        // Get the spawn location
-        Vector2 spawn = level.getPlayerSpawn();
-        if (spawn == null) {
-            spawn = new Vector2(0, 0);
-        }
         
-        // Create creature for player
-        Creature creature = new Creature();
-       
-        creature.setAnimation(
-                Creature.STATUS_IDLE,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-idle.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-        
-        creature.setAnimation(
-                Creature.STATUS_WALKING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-walk.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-        
-        creature.setAnimation(
-                Creature.STATUS_JUMPING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-jump.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-        
-        creature.setAnimation(
-                Creature.STATUS_CLIMBING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-climb.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-        
-        // Create size and position components
-        Size size = new Size(16, 16);
-        Position pos = new Position(
-            spawn.x + size.getWidth()/2,
-            spawn.y + size.getHeight()/2
-        );
-
-        // Create entity and add components
-        Entity e = world.createEntity();
-        e.addComponent(pos);
-        e.addComponent(size);
-        e.addComponent(new Velocity(0, 0));
-        e.addComponent(new Gravity(-3.0f, -0.25f));
-        e.addComponent(creature);
-        e.addComponent(new Appearance(creature.getCurrentAnimation()));
-        
-        world.getManager(TagManager.class).register("PLAYER", e);
-        world.addEntity(e);
+        // Create entities
+        level.createEntities(world);
     }
 
     @Override

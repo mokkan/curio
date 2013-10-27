@@ -1,16 +1,30 @@
 package com.wasome.curio;
 
+import com.artemis.Entity;
+import com.artemis.World;
+import com.artemis.managers.TagManager;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
+import com.wasome.curio.components.Appearance;
+import com.wasome.curio.components.Creature;
+import com.wasome.curio.components.Gravity;
+import com.wasome.curio.components.Position;
+import com.wasome.curio.components.Size;
+import com.wasome.curio.components.Treasure;
+import com.wasome.curio.components.Velocity;
+import com.wasome.curio.sprites.Animation;
+import com.wasome.curio.sprites.AnimationState;
 
 public class Level {
     
+    private AssetManager assetManager;
     private static final int[] renderLayers = {0, 1};
     private OrthogonalTiledMapRenderer renderer;
     private TiledMap map;
@@ -20,7 +34,8 @@ public class Level {
     private int tileWidth;
     private int tileHeight;
     
-    public Level(TiledMap map) {
+    public Level(TiledMap map, AssetManager assetManager) {
+        this.assetManager = assetManager;
         setMap(map);
     }
     
@@ -36,13 +51,14 @@ public class Level {
         return map.getProperties().get("background").toString();
     }
     
-    public Vector2 getPlayerSpawn() {
+    public void createEntities(World world) {
         if (entitiesLayer == null) {
-            return null;
+            return;
         }
         
         Cell cell;
         TiledMapTile tile;
+        MapProperties props;
         
         for (int y = 0; y < entitiesLayer.getHeight(); y++) {
             for (int x = 0; x < entitiesLayer.getWidth(); x++) {
@@ -52,14 +68,103 @@ public class Level {
                 }
                 
                 tile = cell.getTile();
+                props = tile.getProperties();
                 
-                if (tile.getProperties().containsKey("player")) {
-                    return new Vector2(x * tileWidth, y * tileHeight);
+                if (props.containsKey("player")) {
+                    addPlayer(world, x * tileWidth, y * tileHeight);
+                } else if (props.containsKey("treasure")) {
+                    String anim = "assets/sprites/"
+                                + props.get("animation").toString();
+                    int v = Integer.parseInt(props.get("treasure").toString());
+                    addTreasure(world, anim, x * tileWidth, y * tileHeight, v);
                 }
             }
         }
+    }
+    
+    private void addPlayer(World world, int x, int y) {
+        // Create creature for player
+        Creature creature = new Creature();
+       
+        creature.setAnimation(
+                Creature.STATUS_IDLE,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-idle.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
         
-        return null;
+        creature.setAnimation(
+                Creature.STATUS_WALKING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-walk.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_JUMPING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-jump.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_CLIMBING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-climb.anim", 
+                             Animation.class
+                        ), false, false, false
+                )
+        );
+        
+        // Create size and position components
+        Size size = new Size(16, 16);
+        Position pos = new Position(
+            x + size.getWidth()/2,
+            y + size.getHeight()/2
+        );
+
+        // Create entity and add components
+        Entity e = world.createEntity();
+        e.addComponent(pos);
+        e.addComponent(size);
+        e.addComponent(new Velocity(0, 0));
+        e.addComponent(new Gravity(-3.0f, -0.25f));
+        e.addComponent(creature);
+        e.addComponent(new Appearance(creature.getCurrentAnimation()));
+        
+        world.getManager(TagManager.class).register("PLAYER", e);
+        world.addEntity(e);
+    }
+    
+    private void addTreasure(World world, String aniFile, int x, int y, int v) {
+        // Get the animation
+        Animation ani = assetManager.get(aniFile, Animation.class);
+        AnimationState aniState = new AnimationState(ani, false, false, false);
+        
+        // Create size and position entities
+        Size size = new Size(ani.getWidth(), ani.getHeight());
+        Position pos = new Position(
+            x + size.getWidth()/2,
+            y + size.getHeight()/2
+        );
+        
+        // Create the entity
+        Entity e = world.createEntity();
+        e.addComponent(pos);
+        e.addComponent(size);
+        e.addComponent(new Appearance(aniState));
+        e.addComponent(new Treasure(v));
+        world.addEntity(e);
     }
     
     public void setMap(TiledMap map) {
