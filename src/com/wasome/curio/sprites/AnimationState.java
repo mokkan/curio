@@ -11,6 +11,8 @@ public class AnimationState {
     private boolean reversed = false;
     private boolean paused = false;
     private boolean loop;
+    private boolean hflip = false;
+    private boolean vflip = false;
     
     public AnimationState(Animation anim, boolean loop) {
         
@@ -23,9 +25,16 @@ public class AnimationState {
     }
     
     public void flip(boolean hflip, boolean vflip) {
-        for (int i = 0; i < frames.length; i++) {
-            frames[i].getTextureRegion().flip(hflip, vflip);
-        }
+        this.hflip = hflip;
+        this.vflip = vflip;
+    }
+    
+    public boolean isVertFlipped() {
+        return vflip;
+    }
+    
+    public boolean isHorizFlipped() {
+        return hflip;
     }
     
     public void setReversed(boolean reversed) {

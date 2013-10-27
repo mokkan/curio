@@ -64,15 +64,23 @@ public class RenderingSystem extends EntitySystem {
         
         anim.update(world.getDelta() / 1000);
         
-        float halfW = size.getWidth() / 2;
-        float halfH = size.getHeight() / 2;
+        float w = size.getWidth();
+        float h = size.getHeight();
         
-        float x = pos.getX() - halfW;
-        float y = pos.getY() - halfH;
+        if (anim.isHorizFlipped()) {
+            w *= -1;
+        }
+        
+        if (anim.isVertFlipped()) {
+            h *= -1;
+        }
+        
+        float x = pos.getX() - w / 2;
+        float y = pos.getY() - h / 2;
         
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
-        batch.draw(anim.getCurrentFrame(), x, y); 
+        batch.draw(anim.getCurrentFrame(), x, y, w, h);
         batch.end();
     }
     
