@@ -122,7 +122,7 @@ public class GameScreen implements Screen {
         
         world.setSystem(renderingSystem);
         world.setSystem(inputSystem);
-        world.setSystem(new MovementSystem(level));
+        world.setSystem(new MovementSystem(this, level));
         world.setSystem(new GravitySystem());
         
         world.initialize();
@@ -190,6 +190,14 @@ public class GameScreen implements Screen {
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);
         cam.update();
+    }
+    
+    public int getScore() {
+        return score;
+    }
+    
+    public void setScore(int score) {
+        this.score = score;
     }
     
     @Override

@@ -2,6 +2,7 @@ package com.wasome.curio;
 
 import com.artemis.Entity;
 import com.artemis.World;
+import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -164,6 +165,9 @@ public class Level {
         e.addComponent(size);
         e.addComponent(new Appearance(aniState));
         e.addComponent(new Treasure(v));
+
+        world.getManager(GroupManager.class).add(e, "TREASURE");
+        
         world.addEntity(e);
     }
     
