@@ -9,6 +9,7 @@
  <tile id="1">
   <properties>
    <property name="treasure" value="100"/>
+   <property name="animation" value="coin.anim"/>
   </properties>
  </tile>
 </tileset>
