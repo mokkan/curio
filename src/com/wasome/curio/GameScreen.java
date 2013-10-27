@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationLoader;
+import com.wasome.curio.sprites.AnimationState;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -42,6 +43,7 @@ public class GameScreen implements Screen {
     private int camHeight;
     private int zoomFactor;
     private int score = 0;
+    private InventoryItem item = null;
     final protected static int gameWidth = 640;
     final protected static int gameHeight = 480;
 
@@ -61,7 +63,10 @@ public class GameScreen implements Screen {
         );
 
         // Load sounds
+        assetManager.load("assets/sounds/jump.wav", Sound.class);
         assetManager.load("assets/sounds/collect.wav", Sound.class);
+        assetManager.load("assets/sounds/item-pickup.wav", Sound.class);
+        assetManager.load("assets/sounds/item-drop.wav", Sound.class);
         assetManager.finishLoading();
         
         // Load the font
@@ -72,6 +77,7 @@ public class GameScreen implements Screen {
 
         // Load the animations
         assetManager.load("assets/sprites/coin.anim", Animation.class);
+        assetManager.load("assets/sprites/key.anim", Animation.class);
         assetManager.load("assets/sprites/imp-idle.anim", Animation.class);
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
         assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
@@ -110,7 +116,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Set up entity system
-        inputSystem = new InputSystem(level);
+        inputSystem = new InputSystem(this, level);
         renderingSystem = new RenderingSystem(cam);
         
         world = new World();
@@ -166,8 +172,27 @@ public class GameScreen implements Screen {
         
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
-        font.draw(batch, scoreStr, (gameWidth / 2) - fontBounds.width - 16, 32);
+        font.draw(batch, scoreStr, (gameWidth / 2) - fontBounds.width - 16, 28);
         batch.end();
+        
+        String itemStr = "Item: ";
+        fontBounds = font.getBounds(itemStr);
+        
+        batch.begin();
+        font.draw(batch, itemStr, (gameWidth / 2) + 16, 28);
+        batch.end();
+        
+        if (item != null) {
+            AnimationState itemAnim = item.getAnimation();
+            itemAnim.update(delta);
+            batch.begin();
+            batch.draw(itemAnim.getCurrentFrame(), (gameWidth / 2) + fontBounds.width + 16, 16);
+            batch.end();
+        } else {
+            batch.begin();
+            font.draw(batch, "(none)", (gameWidth / 2) + fontBounds.width + 16, 28);
+            batch.end();
+        }
         
         // Translate for drawing maps and entities
         cam.translate(-16, -48);
@@ -190,12 +215,24 @@ public class GameScreen implements Screen {
         cam.update();
     }
     
+    public AssetManager getAssetManager() {
+        return assetManager;
+    }
+    
     public int getScore() {
         return score;
     }
     
     public void setScore(int score) {
         this.score = score;
+    }
+    
+    public InventoryItem getItem() {
+        return item;
+    }
+    
+    public void setItem(InventoryItem item) {
+        this.item = item;
     }
     
     @Override

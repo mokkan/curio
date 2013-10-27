@@ -77,4 +77,12 @@ public class AnimationState {
         return anim.getFrames().get(currentFrame).getTextureRegion();
     }
     
+    public String getPath() {
+        return anim.getPath();
+    }
+    
+    public Animation getRaw() {
+        return anim;
+    }
+    
 }
