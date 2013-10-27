@@ -63,7 +63,10 @@ public class GameScreen implements Screen {
         );
 
         // Load sounds
+        assetManager.load("assets/sounds/jump.wav", Sound.class);
         assetManager.load("assets/sounds/collect.wav", Sound.class);
+        assetManager.load("assets/sounds/item-pickup.wav", Sound.class);
+        assetManager.load("assets/sounds/item-drop.wav", Sound.class);
         assetManager.finishLoading();
         
         // Load the font
@@ -210,6 +213,10 @@ public class GameScreen implements Screen {
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);
         cam.update();
+    }
+    
+    public AssetManager getAssetManager() {
+        return assetManager;
     }
     
     public int getScore() {

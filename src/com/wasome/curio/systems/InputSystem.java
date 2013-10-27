@@ -11,6 +11,8 @@ import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.wasome.curio.GameScreen;
 import com.wasome.curio.InventoryItem;
 import com.wasome.curio.Level;
@@ -38,11 +40,20 @@ public class InputSystem extends IntervalEntitySystem
     private Level level;
     private int lastDir = DIR_LEFT;
     private GameScreen game;
+    private Sound jumpSnd;
+    private Sound itemPickupSnd;
+    private Sound itemDropSnd;
 
     public InputSystem(GameScreen game, Level level) {
         super(Aspect.getEmpty(), 50);
         this.game = game;
         this.level = level;
+        
+        AssetManager assetManager = game.getAssetManager();
+        
+        jumpSnd = assetManager.get("assets/sounds/jump.wav", Sound.class);
+        itemPickupSnd = assetManager.get("assets/sounds/item-pickup.wav", Sound.class);
+        itemDropSnd = assetManager.get("assets/sounds/item-drop.wav", Sound.class);
     }
 
     @Override
@@ -121,6 +132,7 @@ public class InputSystem extends IntervalEntitySystem
                 creature.setStatus(Creature.STATUS_JUMPING);
                 v.setY(3.0f);
                 appearance.setAnimation(creature.getCurrentAnimation());
+                jumpSnd.play();
             }
             
             itemEntities = world.getManager(GroupManager.class).getEntities("ITEM");
@@ -160,6 +172,8 @@ public class InputSystem extends IntervalEntitySystem
                         
                         game.setItem(new InventoryItem(itemType, itemApp.getAnimation().getRaw()));
                         
+                        itemPickupSnd.play();
+                        
                         itemEntity.deleteFromWorld();
                         
                         return true;
@@ -198,6 +212,7 @@ public class InputSystem extends IntervalEntitySystem
                 
                 game.setItem(null);
                 
+                itemDropSnd.play();
             }
         }
         
