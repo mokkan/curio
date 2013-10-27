@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationLoader;
+import com.wasome.curio.sprites.AnimationState;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -168,8 +169,27 @@ public class GameScreen implements Screen {
         
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
-        font.draw(batch, scoreStr, (gameWidth / 2) - fontBounds.width - 16, 32);
+        font.draw(batch, scoreStr, (gameWidth / 2) - fontBounds.width - 16, 28);
         batch.end();
+        
+        String itemStr = "Item: ";
+        fontBounds = font.getBounds(itemStr);
+        
+        batch.begin();
+        font.draw(batch, itemStr, (gameWidth / 2) + 16, 28);
+        batch.end();
+        
+        if (item != null) {
+            AnimationState itemAnim = item.getAnimation();
+            itemAnim.update(delta);
+            batch.begin();
+            batch.draw(itemAnim.getCurrentFrame(), (gameWidth / 2) + fontBounds.width + 16, 16);
+            batch.end();
+        } else {
+            batch.begin();
+            font.draw(batch, "(none)", (gameWidth / 2) + fontBounds.width + 16, 28);
+            batch.end();
+        }
         
         // Translate for drawing maps and entities
         cam.translate(-16, -48);

@@ -21,4 +21,8 @@ public class InventoryItem {
         return anim.getPath();
     }
     
+    public AnimationState getAnimation() {
+        return anim;
+    }
+    
 }
