@@ -147,7 +147,7 @@ public class Level {
         e.addComponent(new Velocity(0, 0));
         e.addComponent(new Gravity(-3.0f, -0.25f));
         e.addComponent(creature);
-        e.addComponent(new Appearance(creature.getCurrentAnimation()));
+        e.addComponent(new Appearance(creature.getCurrentAnimation(), 1));
         
         world.getManager(TagManager.class).register("PLAYER", e);
         world.addEntity(e);
@@ -169,7 +169,7 @@ public class Level {
         Entity e = world.createEntity();
         e.addComponent(pos);
         e.addComponent(size);
-        e.addComponent(new Appearance(aniState));
+        e.addComponent(new Appearance(aniState, 0));
         e.addComponent(new Treasure(v));
 
         world.getManager(GroupManager.class).add(e, "TREASURE");
@@ -193,7 +193,7 @@ public class Level {
         Entity e = world.createEntity();
         e.addComponent(pos);
         e.addComponent(size);
-        e.addComponent(new Appearance(aniState));
+        e.addComponent(new Appearance(aniState, 0));
         e.addComponent(new Item(t));
 
         world.getManager(GroupManager.class).add(e, "ITEM");
