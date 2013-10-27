@@ -7,7 +7,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader;
+import com.badlogic.gdx.assets.loaders.SoundLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -66,6 +68,10 @@ public class GameScreen implements Screen {
                 new BitmapFontLoader(new InternalFileHandleResolver())
         );
         
+        // Load sounds
+        assetManager.load("assets/sounds/collect.wav", Sound.class);
+        assetManager.finishLoading();
+        
         // Load the font
         String fontFile = "assets/fonts/yacimiento.fnt";
         assetManager.load(fontFile, BitmapFont.class);
@@ -122,7 +128,7 @@ public class GameScreen implements Screen {
         
         world.setSystem(renderingSystem);
         world.setSystem(inputSystem);
-        world.setSystem(new MovementSystem(this, level));
+        world.setSystem(new MovementSystem(this, assetManager, level));
         world.setSystem(new GravitySystem());
         
         world.initialize();

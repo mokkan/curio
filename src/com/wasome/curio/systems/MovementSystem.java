@@ -8,6 +8,8 @@ import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
 import com.artemis.systems.IntervalEntitySystem;
 import com.artemis.utils.ImmutableBag;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.wasome.curio.GameScreen;
 import com.wasome.curio.Level;
 import com.wasome.curio.components.Appearance;
@@ -29,12 +31,14 @@ public class MovementSystem extends IntervalEntitySystem {
     private Level level;
     private Entity player;
     private GameScreen game;
+    private AssetManager assetManager;
     
     @SuppressWarnings("unchecked")
-    public MovementSystem(GameScreen game, Level level) {
+    public MovementSystem(GameScreen game, AssetManager asm, Level level) {
         super(Aspect.getAspectForAll(Velocity.class, Position.class), 10);
         this.game = game;
         this.level = level;
+        this.assetManager = asm;
     }
     
     @Override
@@ -82,7 +86,9 @@ public class MovementSystem extends IntervalEntitySystem {
         updateStatus(e);
         
         // Run player-specific code
-        processPlayer(e);
+        if (e.getId() == player.getId()) {
+            processPlayer(e);
+        }
     }
     
     void processPlayer(Entity e) {
@@ -102,6 +108,8 @@ public class MovementSystem extends IntervalEntitySystem {
                 val = treasureMapper.get(treasure).getValue();
                 game.setScore(game.getScore() + val);
                 treasure.deleteFromWorld();
+                Sound snd = assetManager.get("assets/sounds/collect.wav", Sound.class);
+                snd.play();
             }
         }
     }
