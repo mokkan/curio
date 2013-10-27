@@ -10,3 +10,6 @@
 
  * "Jump" by soundnimja (assets/sounds/jump.wav)
    http://www.freesound.org/people/soundnimja/sounds/173326/
+
+ * "Door Open" by Hitrison (assets/sounds/door-open.wav)
+   http://www.freesound.org/people/Hitrison/sounds/198869/
