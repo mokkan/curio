@@ -10,7 +10,7 @@ public class InventoryItem {
     
     public InventoryItem(String type, Animation anim) {
         this.type = type;
-        this.anim = new AnimationState(anim, false, false, false);
+        this.anim = new AnimationState(anim, true);
     }
     
     public String getType() {

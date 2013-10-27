@@ -26,6 +26,9 @@ import com.wasome.curio.sprites.AnimationState;
 
 public class Level {
     
+    public final static int LAYER_TERRAIN = 0;
+    public final static int LAYER_INTERACTIVE = 1;
+    public final static int LAYER_ENTITIES = 2;
     private AssetManager assetManager;
     private static final int[] renderLayers = {0, 1};
     private OrthogonalTiledMapRenderer renderer;
@@ -99,7 +102,7 @@ public class Level {
                         assetManager.get(
                             "assets/sprites/imp-idle.anim", 
                              Animation.class
-                        ), false, false, false
+                        ), true
                 )
         );
         
@@ -109,7 +112,7 @@ public class Level {
                         assetManager.get(
                             "assets/sprites/imp-walk.anim", 
                              Animation.class
-                        ), false, false, false
+                        ), true
                 )
         );
         
@@ -119,7 +122,7 @@ public class Level {
                         assetManager.get(
                             "assets/sprites/imp-jump.anim", 
                              Animation.class
-                        ), false, false, false
+                        ), true
                 )
         );
         
@@ -129,7 +132,7 @@ public class Level {
                         assetManager.get(
                             "assets/sprites/imp-climb.anim", 
                              Animation.class
-                        ), false, false, false
+                        ), true
                 )
         );
         
@@ -156,7 +159,7 @@ public class Level {
     private void addTreasure(World world, String aniFile, int x, int y, int v) {
         // Get the animation
         Animation ani = assetManager.get(aniFile, Animation.class);
-        AnimationState aniState = new AnimationState(ani, false, false, false);
+        AnimationState aniState = new AnimationState(ani, true);
         
         // Create size and position entities
         Size size = new Size(ani.getWidth(), ani.getHeight());
@@ -180,7 +183,7 @@ public class Level {
     public void addItem(World world, String aniFile, String t, int x, int y) {
         // Get the animation
         Animation ani = assetManager.get(aniFile, Animation.class);
-        AnimationState aniState = new AnimationState(ani, false, false, false);
+        AnimationState aniState = new AnimationState(ani, true);
         
         // Create size and position entities
         Size size = new Size(ani.getWidth(), ani.getHeight());
@@ -259,6 +262,39 @@ public class Level {
         
         TiledMapTile interactiveTile = interactiveCell.getTile();
         return interactiveTile.getProperties().containsKey("ladder");
+    }
+    
+    public boolean isCellDoor(int x, int y) {
+        Cell interactiveCell = interactiveLayer.getCell(x, y);
+        
+        if (interactiveCell == null) {
+            return false;
+        }
+        
+        TiledMapTile interactiveTile = interactiveCell.getTile();
+        return interactiveTile.getProperties().containsKey("door");
+    }
+    
+    public MapProperties getTileProperties(int layerId, int x, int y) {
+        TiledMapTileLayer layer;
+        
+        if (layerId == LAYER_TERRAIN) {
+            layer = terrainLayer;
+        } else if (layerId == LAYER_INTERACTIVE) {
+            layer = interactiveLayer;
+        } else if (layerId == LAYER_ENTITIES) {
+            layer = entitiesLayer;
+        } else {
+            return null;
+        }
+        
+        Cell cell = layer.getCell(x, y);
+        
+        if (cell == null) {
+            return null;
+        }
+        
+        return cell.getTile().getProperties();
     }
     
 }

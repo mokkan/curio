@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<animation width="16" height="16" sheet="door.png">
+<animation width="16" height="16" sheet="gold-door.png">
   <frame x="0" y="0" time="200" />
   <frame x="16" y="0" time="200" />
   <frame x="32" y="0" time="200" />
