@@ -6,8 +6,6 @@ import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.BitmapFontLoader;
-import com.badlogic.gdx.assets.loaders.SoundLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
@@ -61,13 +59,7 @@ public class GameScreen implements Screen {
                 Animation.class,
                 new AnimationLoader(new InternalFileHandleResolver())
         );
-        
-        // Set the font loader
-        assetManager.setLoader(
-                BitmapFont.class,
-                new BitmapFontLoader(new InternalFileHandleResolver())
-        );
-        
+
         // Load sounds
         assetManager.load("assets/sounds/collect.wav", Sound.class);
         assetManager.finishLoading();
