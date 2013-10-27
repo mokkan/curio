@@ -16,6 +16,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Gravity;
+import com.wasome.curio.components.Item;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Treasure;
@@ -78,6 +79,11 @@ public class Level {
                                 + props.get("animation").toString();
                     int v = Integer.parseInt(props.get("treasure").toString());
                     addTreasure(world, anim, x * tileWidth, y * tileHeight, v);
+                } else if (props.containsKey("item")) {
+                    String anim = "assets/sprites/"
+                            + props.get("animation").toString();
+                    String type = props.get("item").toString();
+                    addItem(world, anim, type, x, y);
                 }
             }
         }
@@ -167,6 +173,30 @@ public class Level {
         e.addComponent(new Treasure(v));
 
         world.getManager(GroupManager.class).add(e, "TREASURE");
+        
+        world.addEntity(e);
+    }
+    
+    public void addItem(World world, String aniFile, String t, int x, int y) {
+        // Get the animation
+        Animation ani = assetManager.get(aniFile, Animation.class);
+        AnimationState aniState = new AnimationState(ani, false, false, false);
+        
+        // Create size and position entities
+        Size size = new Size(ani.getWidth(), ani.getHeight());
+        Position pos = new Position(
+            (x * tileWidth) + size.getWidth()/2,
+            (y * tileHeight) + size.getHeight()/2
+        );
+        
+        // Create the entity
+        Entity e = world.createEntity();
+        e.addComponent(pos);
+        e.addComponent(size);
+        e.addComponent(new Appearance(aniState));
+        e.addComponent(new Item(t));
+
+        world.getManager(GroupManager.class).add(e, "ITEM");
         
         world.addEntity(e);
     }

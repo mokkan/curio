@@ -15,7 +15,7 @@
  <tile id="2">
   <properties>
    <property name="animation" value="key.anim"/>
-   <property name="key" value=""/>
+   <property name="item" value="key"/>
   </properties>
  </tile>
 </tileset>

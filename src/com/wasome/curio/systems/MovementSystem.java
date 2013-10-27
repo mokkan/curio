@@ -114,7 +114,7 @@ public class MovementSystem extends IntervalEntitySystem {
         }
     }
     
-    public boolean checkCollision(Position p1, Size s1, Position p2, Size s2) {
+    public static boolean checkCollision(Position p1, Size s1, Position p2, Size s2) {
         float x1 = p1.getX() - s1.getWidth()/2;
         float y1 = p1.getY() - s1.getHeight()/2;
         float w1 = s1.getWidth();

@@ -114,7 +114,7 @@ public class AnimationLoader extends
                             }
                         }
                         
-                        anim = new Animation(sheet, w, h);
+                        anim = new Animation(sheet, w, h, file.path());
                     } else if (name == "frame") {
                         int x = 0;
                         int y = 0;

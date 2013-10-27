@@ -9,11 +9,13 @@ public class Animation {
     private ArrayList<Frame> frames;
     private int width;
     private int height;
+    private String path;
     
-    public Animation(Texture sheet, int width, int height) {
+    public Animation(Texture sheet, int width, int height, String path) {
         this.sheet = sheet;
         this.width = width;
         this.height = height;
+        this.path = path;
         frames = new ArrayList<Frame>();
     }
     
@@ -31,6 +33,10 @@ public class Animation {
     
     public int getHeight() {
         return height;
+    }
+    
+    public String getPath() {
+        return path;
     }
     
 }

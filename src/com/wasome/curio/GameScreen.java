@@ -42,6 +42,7 @@ public class GameScreen implements Screen {
     private int camHeight;
     private int zoomFactor;
     private int score = 0;
+    private InventoryItem item = null;
     final protected static int gameWidth = 640;
     final protected static int gameHeight = 480;
 
@@ -72,6 +73,7 @@ public class GameScreen implements Screen {
 
         // Load the animations
         assetManager.load("assets/sprites/coin.anim", Animation.class);
+        assetManager.load("assets/sprites/key.anim", Animation.class);
         assetManager.load("assets/sprites/imp-idle.anim", Animation.class);
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
         assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
@@ -110,7 +112,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Set up entity system
-        inputSystem = new InputSystem(level);
+        inputSystem = new InputSystem(this, level);
         renderingSystem = new RenderingSystem(cam);
         
         world = new World();
@@ -196,6 +198,14 @@ public class GameScreen implements Screen {
     
     public void setScore(int score) {
         this.score = score;
+    }
+    
+    public InventoryItem getItem() {
+        return item;
+    }
+    
+    public void setItem(InventoryItem item) {
+        this.item = item;
     }
     
     @Override
