@@ -67,6 +67,7 @@ public class GameScreen implements Screen {
         assetManager.load("assets/sounds/collect.wav", Sound.class);
         assetManager.load("assets/sounds/item-pickup.wav", Sound.class);
         assetManager.load("assets/sounds/item-drop.wav", Sound.class);
+        assetManager.load("assets/sounds/door-open.wav", Sound.class);
         assetManager.finishLoading();
         
         // Load the font
@@ -76,6 +77,7 @@ public class GameScreen implements Screen {
         font = assetManager.get(fontFile, BitmapFont.class);
 
         // Load the animations
+        assetManager.load("assets/sprites/door-open.anim", Animation.class);
         assetManager.load("assets/sprites/coin.anim", Animation.class);
         assetManager.load("assets/sprites/key.anim", Animation.class);
         assetManager.load("assets/sprites/imp-idle.anim", Animation.class);

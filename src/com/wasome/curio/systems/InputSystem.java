@@ -22,6 +22,8 @@ import com.wasome.curio.components.Item;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Velocity;
+import com.wasome.curio.sprites.Animation;
+import com.wasome.curio.sprites.AnimationState;
 
 public class InputSystem extends IntervalEntitySystem
     implements InputProcessor {
@@ -63,157 +65,189 @@ public class InputSystem extends IntervalEntitySystem
 
     @Override
     public boolean keyDown(int keycode) {
-        if (player != null) {
-            Position p = positionMapper.get(player);
-            Velocity v = velocityMapper.get(player);
-            Creature creature = creatureMapper.get(player);
-            Size size = sizeMapper.get(player);
-            Appearance appearance = appearanceMapper.get(player);
-            
-            int status = creature.getStatus();
-            int tileW = level.getTileWidth();
-            int tileH = level.getTileHeight();
-            
-            int tileX = (int) p.getX() / tileW;
-            int tileY = (int) p.getY() / tileH;
-            int tileBot = (int) (p.getY() - (size.getHeight() / 2)) / tileH;
-            
-            int newDir = 0;
-            
-            if (keycode == Keys.LEFT) {
-                v.setX(-1);
-                newDir = DIR_LEFT;
-            }
-            
-            if (keycode == Keys.RIGHT) {
-                v.setX(1);
-                newDir = DIR_RIGHT;
-            }
-            
-            if (newDir != 0 && lastDir != newDir) {
-                creature.getAnimation(Creature.STATUS_IDLE).flip(true, false);
-                creature.getAnimation(Creature.STATUS_WALKING).flip(true, false);
-                creature.getAnimation(Creature.STATUS_JUMPING).flip(true, false);
-            }
-            
-            lastDir = newDir != 0 ? newDir : lastDir;
+        if (player == null) {
+            return true;
+        }
+        
+        AssetManager assetManager = game.getAssetManager();
+        Position p = positionMapper.get(player);
+        Velocity v = velocityMapper.get(player);
+        Creature creature = creatureMapper.get(player);
+        Size size = sizeMapper.get(player);
+        Appearance appearance = appearanceMapper.get(player);
+        
+        int status = creature.getStatus();
+        int tileW = level.getTileWidth();
+        int tileH = level.getTileHeight();
+        
+        int tileX = (int) p.getX() / tileW;
+        int tileY = (int) p.getY() / tileH;
+        int tileBot = (int) (p.getY() - (size.getHeight() / 2)) / tileH;
+        
+        int newDir = 0;
+        
+        if (keycode == Keys.LEFT) {
+            v.setX(-1);
+            newDir = DIR_LEFT;
+        }
+        
+        if (keycode == Keys.RIGHT) {
+            v.setX(1);
+            newDir = DIR_RIGHT;
+        }
+        
+        if (newDir != 0 && lastDir != newDir) {
+            creature.getAnimation(Creature.STATUS_IDLE).flip(true, false);
+            creature.getAnimation(Creature.STATUS_WALKING).flip(true, false);
+            creature.getAnimation(Creature.STATUS_JUMPING).flip(true, false);
+        }
+        
+        lastDir = newDir != 0 ? newDir : lastDir;
 
-            if (keycode == Keys.UP && level.isCellLadder(tileX, tileBot)) {
-                v.setX(0);
-                v.setY(1);
-                p.setX(((int) p.getX() / 16) * 16 + 8);
+        if (keycode == Keys.UP && level.isCellLadder(tileX, tileBot)) {
+            v.setX(0);
+            v.setY(1);
+            p.setX(((int) p.getX() / 16) * 16 + 8);
 
-                if (status != Creature.STATUS_CLIMBING) {
-                    creature.setStatus(Creature.STATUS_CLIMBING);
-                    appearance.setAnimation(creature.getCurrentAnimation());
-                } else {
-                    creature.getCurrentAnimation().resume();
-                }
-            }
-            
-            if (keycode == Keys.DOWN && (level.isCellLadder(tileX, tileY - 1)
-                    || level.isCellLadder(tileX, tileY))) {
-                
-                v.setX(0);
-                v.setY(-1);
-                p.setX(((int) p.getX() / 16) * 16 + 8);
-                
-                if (status != Creature.STATUS_CLIMBING) {
-                    creature.setStatus(Creature.STATUS_CLIMBING);
-                    appearance.setAnimation(creature.getCurrentAnimation());
-                } else {
-                    creature.getCurrentAnimation().resume();
-                }
-            }
-            
-            if (keycode == Keys.SPACE && status != Creature.STATUS_JUMPING
-                    && status != Creature.STATUS_CLIMBING) {
-                
-                creature.setStatus(Creature.STATUS_JUMPING);
-                v.setY(3.0f);
+            if (status != Creature.STATUS_CLIMBING) {
+                creature.setStatus(Creature.STATUS_CLIMBING);
                 appearance.setAnimation(creature.getCurrentAnimation());
-                jumpSnd.play();
+            } else {
+                creature.getCurrentAnimation().resume();
             }
+        }
+        
+        if (keycode == Keys.DOWN && (level.isCellLadder(tileX, tileY - 1)
+                || level.isCellLadder(tileX, tileY))) {
             
-            itemEntities = world.getManager(GroupManager.class).getEntities("ITEM");
+            v.setX(0);
+            v.setY(-1);
+            p.setX(((int) p.getX() / 16) * 16 + 8);
             
-            // use item
-            if (keycode == Keys.SHIFT_LEFT) {                
-
+            if (status != Creature.STATUS_CLIMBING) {
+                creature.setStatus(Creature.STATUS_CLIMBING);
+                appearance.setAnimation(creature.getCurrentAnimation());
+            } else {
+                creature.getCurrentAnimation().resume();
             }
+        }
+        
+        if (keycode == Keys.SPACE && status != Creature.STATUS_JUMPING
+                && status != Creature.STATUS_CLIMBING) {
             
-            // action/grab item
-            if (keycode == Keys.CONTROL_LEFT) {
-                Position p1 = positionMapper.get(player);
-                Size s1 = sizeMapper.get(player);
-                Position p2;
-                Size s2;
+            creature.setStatus(Creature.STATUS_JUMPING);
+            v.setY(3.0f);
+            appearance.setAnimation(creature.getCurrentAnimation());
+            jumpSnd.play();
+        }
+        
+        itemEntities = world.getManager(GroupManager.class).getEntities("ITEM");
+        
+        // use item
+        if (keycode == Keys.SHIFT_LEFT) {                
+            InventoryItem item = game.getItem();
+            
+            if (item == null) {
+                return true;
+            }
 
-                for (int i = 0; i < itemEntities.size(); i++) {
-                    Entity itemEntity = itemEntities.get(i);
-                    p2 = positionMapper.get(itemEntity);
-                    s2 = sizeMapper.get(itemEntity);
-                    Appearance itemApp = appearanceMapper.get(itemEntity);
+            if (item.getType().equals("key")) {
+                if (level.isCellDoor(tileX, tileY)) {
+                    String animFile = "assets/sprites/"
+                                    + level.getTileProperties(
+                        Level.LAYER_INTERACTIVE,
+                        tileX,
+                        tileY
+                    ).get("animation").toString();
+                    
+                    AnimationState anim = new AnimationState(
+                        assetManager.get(animFile, Animation.class),
+                        false
+                    );
 
-                    if (MovementSystem.checkCollision(p1, s1, p2, s2)) {
-                        Item item = itemMapper.get(itemEntity);
-                        String itemType = item.getType();
-                        InventoryItem oldItem = game.getItem();
-                        
-                        if (oldItem != null) {
-                            level.addItem(
-                                world,
-                                oldItem.getAnimationPath(),
-                                oldItem.getType(),
-                                (int)p2.getX() / level.getTileWidth(),
-                                (int)p2.getY() / level.getTileHeight()
-                            );
-                        }
-                        
-                        game.setItem(new InventoryItem(itemType, itemApp.getAnimation().getRaw()));
-                        
-                        itemPickupSnd.play();
-                        
-                        itemEntity.deleteFromWorld();
-                        
-                        return true;
-                    }
+                    Entity e = world.createEntity();
+                    e.addComponent(new Position((tileX * tileW) + tileW/2, (tileY * tileH) + tileH/2));
+                    e.addComponent(new Size(tileW, tileH));
+                    e.addComponent(new Appearance(anim, 0));
+                    world.addEntity(e);
+                    
+                    Sound snd = assetManager.get("assets/sounds/door-open.wav", Sound.class);
+                    snd.play();
                 }
             }
-            
-            // drop item
-            if (keycode == Keys.ALT_LEFT) {
-                InventoryItem item = game.getItem();
-                
-                if (item == null) {
+        }
+        
+        // action/grab item
+        if (keycode == Keys.CONTROL_LEFT) {
+            Position p1 = positionMapper.get(player);
+            Size s1 = sizeMapper.get(player);
+            Position p2;
+            Size s2;
+
+            for (int i = 0; i < itemEntities.size(); i++) {
+                Entity itemEntity = itemEntities.get(i);
+                p2 = positionMapper.get(itemEntity);
+                s2 = sizeMapper.get(itemEntity);
+                Appearance itemApp = appearanceMapper.get(itemEntity);
+
+                if (MovementSystem.checkCollision(p1, s1, p2, s2)) {
+                    Item item = itemMapper.get(itemEntity);
+                    String itemType = item.getType();
+                    InventoryItem oldItem = game.getItem();
+                    
+                    if (oldItem != null) {
+                        level.addItem(
+                            world,
+                            oldItem.getAnimationPath(),
+                            oldItem.getType(),
+                            (int)p2.getX() / level.getTileWidth(),
+                            (int)p2.getY() / level.getTileHeight()
+                        );
+                    }
+                    
+                    game.setItem(new InventoryItem(itemType, itemApp.getAnimation().getRaw()));
+                    
+                    itemPickupSnd.play();
+                    
+                    itemEntity.deleteFromWorld();
+                    
                     return true;
                 }
-                
-                Position p1 = positionMapper.get(player);
-                Size s1 = sizeMapper.get(player);
-                Position p2;
-                Size s2;
-
-                for (int i = 0; i < itemEntities.size(); i++) {
-                    Entity itemEntity = itemEntities.get(i);
-                    p2 = positionMapper.get(itemEntity);
-                    s2 = sizeMapper.get(itemEntity);
-                    if (MovementSystem.checkCollision(p1, s1, p2, s2)) {
-                        return true;
-                    }
-                }
-                level.addItem(
-                    world,
-                    item.getAnimationPath(),
-                    item.getType(),
-                    (int)p1.getX() / level.getTileWidth(),
-                    (int)p1.getY() / level.getTileHeight()
-                );
-                
-                game.setItem(null);
-                
-                itemDropSnd.play();
             }
+        }
+        
+        // drop item
+        if (keycode == Keys.ALT_LEFT) {
+            InventoryItem item = game.getItem();
+            
+            if (item == null) {
+                return true;
+            }
+            
+            Position p1 = positionMapper.get(player);
+            Size s1 = sizeMapper.get(player);
+            Position p2;
+            Size s2;
+
+            for (int i = 0; i < itemEntities.size(); i++) {
+                Entity itemEntity = itemEntities.get(i);
+                p2 = positionMapper.get(itemEntity);
+                s2 = sizeMapper.get(itemEntity);
+                if (MovementSystem.checkCollision(p1, s1, p2, s2)) {
+                    return true;
+                }
+            }
+            level.addItem(
+                world,
+                item.getAnimationPath(),
+                item.getType(),
+                (int)p1.getX() / level.getTileWidth(),
+                (int)p1.getY() / level.getTileHeight()
+            );
+            
+            game.setItem(null);
+            
+            itemDropSnd.play();
         }
         
         return true;

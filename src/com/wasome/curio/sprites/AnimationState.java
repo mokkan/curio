@@ -10,23 +10,27 @@ public class AnimationState {
     private float time = 0;
     private boolean reversed = false;
     private boolean paused = false;
+    private boolean loop;
     
-    public AnimationState(Animation anim, boolean hflip, boolean vflip,
-            boolean reversed) {
+    public AnimationState(Animation anim, boolean loop) {
         
         this.anim = anim;
-        this.reversed = reversed;
+        this.loop = loop;
+        this.reversed = false;
         
         frames = anim.getFrames().toArray(new Frame[anim.getFrames().size()]);
         time = frames[0].getTime();
-        
-        flip(hflip, vflip);
     }
     
     public void flip(boolean hflip, boolean vflip) {
         for (int i = 0; i < frames.length; i++) {
             frames[i].getTextureRegion().flip(hflip, vflip);
         }
+    }
+    
+    public void setReversed(boolean reversed) {
+        this.reversed = reversed;
+        this.currentFrame = frames.length - 1;
     }
     
     public void pause() {
@@ -54,15 +58,15 @@ public class AnimationState {
             dt -= time;
             
             if (reversed) {
-                if (currentFrame == 0) {
+                if (currentFrame == 0 && loop) {
                     currentFrame = frames.length - 1;
-                } else {
+                } else if (currentFrame != 0) {
                     currentFrame--;
                 }
             } else {
-                if (currentFrame == frames.length - 1) {
+                if (currentFrame == frames.length - 1 && loop) {
                     currentFrame = 0;
-                } else {
+                } else if (currentFrame != frames.length - 1) {
                     currentFrame++;
                 }
             }

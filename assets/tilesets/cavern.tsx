@@ -46,6 +46,12 @@
    <property name="solid" value=""/>
   </properties>
  </tile>
+ <tile id="13">
+  <properties>
+   <property name="door" value=""/>
+   <property name="animation" value="door-open.anim"/>
+  </properties>
+ </tile>
  <tile id="14">
   <properties>
    <property name="solid" value=""/>
