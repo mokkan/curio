@@ -4,6 +4,7 @@
   <property name="background" value="cavern.png"/>
  </properties>
  <tileset firstgid="1" source="../tilesets/cavern.tsx"/>
+ <tileset firstgid="36" source="../tilesets/entities.tsx"/>
  <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+2WwQqAIBBEN7tkBBWdq///y5QQZNPU3NJgB+bSYXuM45YEgKkyS+Ue6lMHzGVrVd4c3gtzhcR5pYnzSpPm0jvMxR7r/TI1rD/nxf2K11dcvnx85u92mkJ7QsCzPUDBdZfX8BUIUohrefn9DZxn0qLnpftleoQZKLhcOyC2kyOc//PzDZeZX6LnWKXP0adcLp0x7iyFKPLSM4RlCk5zH0SGpcM584wP0N0pSHAPAAA=
@@ -12,6 +13,11 @@
  <layer name="Interactive" width="38" height="26">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+2VwQoAIAhDu/n/f9w1IqWxQMM9CCI2eZ4aQwgeyxZwkBeGvDAiL8aZ3Vde7/pdvZD55txROnoxOXlhOXnxub3zm5ctJ5p7ymR7ef3bf6KqV/TOelViAiolhHlwDwAA
+  </data>
+ </layer>
+ <layer name="Entities" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3OsQkAQAjAQIfR/Vf8Gd5CBO8gfSKAbaqZr79y4A0AgLse5bVcsXAPAAA=
   </data>
  </layer>
 </map>

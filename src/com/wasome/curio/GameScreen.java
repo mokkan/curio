@@ -1,6 +1,5 @@
 package com.wasome.curio;
 
-import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
 import com.artemis.managers.TagManager;
@@ -8,21 +7,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.wasome.curio.components.Appearance;
-import com.wasome.curio.components.Creature;
-import com.wasome.curio.components.Gravity;
-import com.wasome.curio.components.Position;
-import com.wasome.curio.components.Size;
-import com.wasome.curio.components.Velocity;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationLoader;
-import com.wasome.curio.sprites.AnimationState;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -33,6 +28,8 @@ public class GameScreen implements Screen {
     private AssetManager assetManager;
     private OrthographicCamera cam;
     private SpriteBatch batch;
+    private BitmapFont font;
+    private TextBounds fontBounds;
     private Texture uiBg;
     private Texture levelBg;
     private World world;
@@ -44,6 +41,7 @@ public class GameScreen implements Screen {
     private int camWidth;
     private int camHeight;
     private int zoomFactor;
+    private int score = 0;
     final protected static int gameWidth = 640;
     final protected static int gameHeight = 480;
 
@@ -61,8 +59,19 @@ public class GameScreen implements Screen {
                 Animation.class,
                 new AnimationLoader(new InternalFileHandleResolver())
         );
+
+        // Load sounds
+        assetManager.load("assets/sounds/collect.wav", Sound.class);
+        assetManager.finishLoading();
         
+        // Load the font
+        String fontFile = "assets/fonts/yacimiento.fnt";
+        assetManager.load(fontFile, BitmapFont.class);
+        assetManager.finishLoading();
+        font = assetManager.get(fontFile, BitmapFont.class);
+
         // Load the animations
+        assetManager.load("assets/sprites/coin.anim", Animation.class);
         assetManager.load("assets/sprites/imp-idle.anim", Animation.class);
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
         assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
@@ -81,7 +90,7 @@ public class GameScreen implements Screen {
         String levelFile = "assets/levels/level1.tmx";
         assetManager.load(levelFile, TiledMap.class);
         assetManager.finishLoading();
-        level = new Level((TiledMap) assetManager.get(levelFile));
+        level = new Level((TiledMap) assetManager.get(levelFile), assetManager);
 
         // Load background
         String bgFile = level.getBackground();
@@ -111,71 +120,15 @@ public class GameScreen implements Screen {
         
         world.setSystem(renderingSystem);
         world.setSystem(inputSystem);
-        world.setSystem(new MovementSystem(level));
+        world.setSystem(new MovementSystem(this, assetManager, level));
         world.setSystem(new GravitySystem());
         
         world.initialize();
         
-        initPlayer();
-        
         Gdx.input.setInputProcessor(inputSystem);
-    }
-    
-    private void initPlayer() {
-        // Create creature for player
-        Creature creature = new Creature();
-       
-        creature.setAnimation(
-                Creature.STATUS_IDLE,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-idle.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
         
-        creature.setAnimation(
-                Creature.STATUS_WALKING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-walk.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-        
-        creature.setAnimation(
-                Creature.STATUS_JUMPING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-jump.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-        
-        creature.setAnimation(
-                Creature.STATUS_CLIMBING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-climb.anim", 
-                             Animation.class
-                        ), false, false, false
-                )
-        );
-
-        // Create appearance for entity
-        Entity e = world.createEntity();
-        e.addComponent(new Position(136, 136));
-        e.addComponent(new Size(16, 16));
-        e.addComponent(new Velocity(0, 0));
-        e.addComponent(new Gravity(-3.0f, -0.25f));
-        e.addComponent(creature);
-        e.addComponent(new Appearance(null));
-        
-        world.getManager(TagManager.class).register("PLAYER", e);
-        world.addEntity(e);
+        // Create entities
+        level.createEntities(world);
     }
 
     @Override
@@ -207,6 +160,15 @@ public class GameScreen implements Screen {
         cam.translate(-horizTrans, -vertTrans);
         cam.update();
         
+        String scoreStr = "Haul: $" + Integer.toString(score);
+        font.getBounds(scoreStr);
+        fontBounds = font.getBounds(scoreStr);
+        
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+        font.draw(batch, scoreStr, (gameWidth / 2) - fontBounds.width - 16, 32);
+        batch.end();
+        
         // Translate for drawing maps and entities
         cam.translate(-16, -48);
         cam.update();
@@ -226,6 +188,14 @@ public class GameScreen implements Screen {
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);
         cam.update();
+    }
+    
+    public int getScore() {
+        return score;
+    }
+    
+    public void setScore(int score) {
+        this.score = score;
     }
     
     @Override
