@@ -35,6 +35,7 @@ public class GameScreen implements Screen {
     private TextBounds fontBounds;
     private Texture uiBg;
     private Texture levelBg;
+    private Texture textDead;
     private World world;
     private RenderingSystem renderingSystem;
     private InputSystem inputSystem;
@@ -48,6 +49,7 @@ public class GameScreen implements Screen {
     private InventoryItem item = null;
     final protected static int gameWidth = 640;
     final protected static int gameHeight = 480;
+    private String levelFile = "";
 
     public GameScreen(Curio game) {
         assetManager = new AssetManager();
@@ -102,7 +104,7 @@ public class GameScreen implements Screen {
         uiBgHeight = uiBg.getHeight();
         
         // Load level 1
-        String levelFile = "assets/levels/level1.tmx";
+        levelFile = "assets/levels/level1.tmx";
         assetManager.load(levelFile, TiledMap.class);
         assetManager.finishLoading();
         level = new Level((TiledMap) assetManager.get(levelFile), assetManager);
@@ -112,6 +114,12 @@ public class GameScreen implements Screen {
         assetManager.load("assets/backgrounds/" + bgFile, Texture.class);
         assetManager.finishLoading();
         levelBg = assetManager.get("assets/backgrounds/" + bgFile);
+        
+        // Load died text
+        String deadFile = "assets/sprites/dead-text.png";
+        assetManager.load(deadFile, Texture.class);
+        assetManager.finishLoading();
+        textDead = assetManager.get(deadFile);
 
         // Create camera
         zoomFactor = Gdx.graphics.getHeight() /  gameHeight;
@@ -125,6 +133,32 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Set up entity system
+        inputSystem = new InputSystem(this, level);
+        renderingSystem = new RenderingSystem(cam);
+        
+        world = new World();
+        
+        world.setManager(new GroupManager());
+        world.setManager(new TagManager());
+        
+        world.setSystem(renderingSystem);
+        world.setSystem(inputSystem);
+        world.setSystem(new MovementSystem(this, assetManager, level));
+        world.setSystem(new GravitySystem());
+        world.setSystem(new EnemyPathingSystem(level));
+        world.setSystem(new EnemyMovementSystem(level));
+        
+        world.initialize();
+        
+        Gdx.input.setInputProcessor(inputSystem);
+        
+        // Create entities
+        level.createEntities(world);
+    }
+    
+    public void resetLevel() {
+        level = new Level((TiledMap) assetManager.get(levelFile), assetManager);
+        
         inputSystem = new InputSystem(this, level);
         renderingSystem = new RenderingSystem(cam);
         
@@ -220,6 +254,15 @@ public class GameScreen implements Screen {
         
         // Draw entities
         renderingSystem.process();
+        
+        // Draw dead text if applicable
+        if (world.getManager(TagManager.class).getEntity("PLAYER") == null) {
+            float textX = gameWidth/2 - textDead.getWidth()/2;
+            float textY = gameHeight/2 - textDead.getHeight();
+            batch.begin();
+            batch.draw(textDead, textX, textY);
+            batch.end();
+        }
         
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);

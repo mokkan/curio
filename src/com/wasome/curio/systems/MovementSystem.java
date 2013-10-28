@@ -147,6 +147,7 @@ public class MovementSystem extends IntervalEntitySystem {
                 appearance.setAnimation(creature.getCurrentAnimation());
                 vel.setY(3.0f);
                 gravity.setTerminal(-10.0f);
+                return;
             }
         }
     }
