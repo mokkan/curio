@@ -48,7 +48,7 @@ public class EnemyPathingSystem extends IntervalEntityProcessingSystem {
         Position pos = positionMapper.get(e);
         Position playerPos = positionMapper.get(player);
         Enemy enemy = enemyMapper.get(e);
-        
+
         int playerTileX = (int) playerPos.getX() / level.getTileWidth();
         int playerTileY = (int) playerPos.getY() / level.getTileHeight();
         
@@ -58,8 +58,8 @@ public class EnemyPathingSystem extends IntervalEntityProcessingSystem {
         }
         
         int tileX = (int) pos.getX() / level.getTileWidth();
-        int tileY = (int) pos.getY() / level.getTileHeight(); 
-        
+        int tileY = (int) pos.getY() / level.getTileHeight();
+
         List<AStarNode> path = map.getPath(
             tileX,
             tileY,
@@ -80,11 +80,6 @@ public class EnemyPathingSystem extends IntervalEntityProcessingSystem {
                     tgtY
                 );
         }
-        
-        /*System.out.print("Target: ");
-        System.out.print(tgtX);
-        System.out.print(" ");
-        System.out.println(tgtY);*/
         
         enemy.setPath(path);
     }

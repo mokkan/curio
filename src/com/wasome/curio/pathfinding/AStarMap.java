@@ -117,10 +117,14 @@ public class AStarMap {
         int count = 0;
         int max = 36 * 28;
         
-        while (current.parent != null && count < max) {
+        while (current.parent != null) {
             pathNodes.add(current);
             current = current.parent;
             count++;
+            
+            if (count >= max) {
+                return null;
+            }
         }
         pathNodes.add(start);
         

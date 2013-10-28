@@ -9,7 +9,7 @@ import com.wasome.curio.pathfinding.AStarNode;
 public class Enemy extends Component {
     
     private List<AStarNode> path = new ArrayList<AStarNode>();
-    public int tgtNode = 1;
+    private int tgtNode = 1;
     
     public List<AStarNode> getPath() {
         return path;

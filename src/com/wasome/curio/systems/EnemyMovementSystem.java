@@ -26,7 +26,7 @@ public class EnemyMovementSystem extends IntervalEntityProcessingSystem {
     
     @SuppressWarnings("unchecked")
     public EnemyMovementSystem(Level level) {
-        super(Aspect.getAspectForAll(Enemy.class), 10);
+        super(Aspect.getAspectForAll(Enemy.class), 20);
         this.level = level;
     }
     
@@ -41,12 +41,67 @@ public class EnemyMovementSystem extends IntervalEntityProcessingSystem {
         
         AStarNode n = enemy.getTargetNode();
         
-        if (n == null) {
-            return;
-        }
+        float bbx1 = pos.getX() - (size.getWidth() / 2);
+        float bby1 = pos.getY() - (size.getHeight() / 2);
+        float bbx2 = pos.getX() + (size.getWidth() / 2);
+        float bby2 = pos.getY() + (size.getHeight() / 2);
         
         int tileX = (int) pos.getX() / level.getTileWidth();
         int tileY = (int) pos.getY() / level.getTileHeight();
+        
+        if (n == null) {
+            boolean stillWorkingX = false;
+            boolean stillWorkingY = false;
+            
+            if (vel.getX() > 0 && bbx1 < (tileX * level.getTileWidth())) {
+                stillWorkingX = true;
+            }
+            
+            if (vel.getX() < 0 && bbx2 > ((tileX + 1) * level.getTileWidth())) {
+                stillWorkingX = true;
+            }
+            
+            if (vel.getY() > 0 && bby1 < (tileY * level.getTileHeight())) {
+                stillWorkingY = true;
+            }
+            
+            if (vel.getY() < 0 && bby2 > ((tileY + 1) * level.getTileHeight())) {
+                stillWorkingY = true;
+            }
+            
+            if (stillWorkingX) {
+                pos.addX(vel.getX());
+            }
+            
+            if (stillWorkingY) {
+                pos.addY(vel.getY());
+            }
+            
+            if (stillWorkingX || stillWorkingY) {
+                return;
+            }
+            
+            pos.setX(tileX * level.getTileWidth() + size.getWidth()/2);
+            
+            vel.setX(0);
+            vel.setY(0);
+            
+            int newStatus = creature.getStatus();
+            
+            if (creature.getStatus() == Creature.STATUS_CLIMBING
+                    && level.isCellLadder(tileX, tileY)) {
+                creature.getCurrentAnimation().pause();
+            } else {
+                newStatus = Creature.STATUS_IDLE;
+            }
+            
+            if (newStatus != creature.getStatus()) {
+                creature.setStatus(newStatus);
+                appearance.setAnimation(creature.getCurrentAnimation());
+            }
+            
+            return;
+        }
         
         if (vel.getX() < 0) {
             creature.getAnimation(Creature.STATUS_IDLE).flip(false, false);
@@ -57,38 +112,32 @@ public class EnemyMovementSystem extends IntervalEntityProcessingSystem {
         }
         
         if (tileX == n.x && tileY == n.y) {
-            float bbx1 = pos.getX() - (size.getWidth() / 2);
-            float bby1 = pos.getY() - (size.getHeight() / 2);
-            float bbx2 = pos.getX() + (size.getWidth() / 2);
-            float bby2 = pos.getY() + (size.getHeight() / 2);
             boolean update = false;
             
-            if (vel.getX() < 0 && bbx1 <= tileX * level.getTileWidth()) {
+            if (vel.getX() < 0 && bbx1 <= n.x * level.getTileWidth()) {
                 update = true;
-            } else if (vel.getX() > 0 && bbx2 >= (tileX + 1) * level.getTileWidth()) {
+            } else if (vel.getX() > 0 && bbx2 >= (n.x + 1) * level.getTileWidth()) {
                 update = true;
-            } else if (vel.getY() < 0 && bby1 <= tileY * level.getTileHeight()) {
+            } else if (vel.getY() < 0 && bby1 <= n.y * level.getTileHeight()) {
                 update = true;
-            } else if (vel.getY() > 0 && bby2 >= (tileY + 1) * level.getTileHeight()) {
+            } else if (vel.getY() > 0 && bby2 >= (n.y + 1) * level.getTileHeight()) {
                 update = true;
             }
             
             if (update) {
                 enemy.setTarget(enemy.getTarget() + 1);
                 n = enemy.getTargetNode();
-                vel.setX(0);
-                vel.setY(0);
             }
         }
         
         int newStatus = creature.getStatus();
-        
+
         if (n != null) {
-            if (tileX < n.x) {
+            if (bbx1 < n.x * level.getTileWidth()) {
                 vel.setX(1);
                 vel.setY(0);
                 newStatus = Creature.STATUS_WALKING;
-            } else if (tileX > n.x) {
+            } else if (bbx2 > (n.x + 1) * level.getTileWidth()) {
                 vel.setX(-1);
                 vel.setY(0);
                 newStatus = Creature.STATUS_WALKING;
@@ -104,21 +153,9 @@ public class EnemyMovementSystem extends IntervalEntityProcessingSystem {
                 newStatus = Creature.STATUS_CLIMBING;
                 pos.setX(tileX * level.getTileWidth() + size.getWidth()/2);
                 creature.getCurrentAnimation().resume();
-            } else {
-                if (creature.getStatus() == Creature.STATUS_CLIMBING) {
-                    creature.getCurrentAnimation().pause();
-                } else {
-                    newStatus = Creature.STATUS_IDLE;
-                }
-            }
-        } else {
-            if (creature.getStatus() == Creature.STATUS_CLIMBING) {
-                creature.getCurrentAnimation().pause();
-            } else {
-                newStatus = Creature.STATUS_IDLE;
             }
         }
-        
+
         if (newStatus != creature.getStatus()) {
             pos.setY(tileY * level.getTileHeight() + size.getHeight()/2);
             creature.setStatus(newStatus);
