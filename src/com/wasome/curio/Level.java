@@ -15,12 +15,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
+import com.wasome.curio.components.Enemy;
 import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Item;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Treasure;
 import com.wasome.curio.components.Velocity;
+import com.wasome.curio.pathfinding.AStarMap;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationState;
 
@@ -38,6 +40,8 @@ public class Level {
     private TiledMapTileLayer entitiesLayer;
     private int tileWidth;
     private int tileHeight;
+    private int[][] pathMap;
+    private AStarMap aStarMap;
     
     public Level(TiledMap map, AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -77,6 +81,8 @@ public class Level {
                 
                 if (props.containsKey("player")) {
                     addPlayer(world, x * tileWidth, y * tileHeight);
+                } else if (props.containsKey("enemy")) { 
+                    addEnemy(world, x * tileWidth, y * tileHeight);
                 } else if (props.containsKey("treasure")) {
                     String anim = "assets/sprites/"
                                 + props.get("animation").toString();
@@ -180,6 +186,65 @@ public class Level {
         world.addEntity(e);
     }
     
+    public void addEnemy(World world, int x, int y) {
+        // Create creature for enemy
+        Creature creature = new Creature();
+       
+        creature.setAnimation(
+                Creature.STATUS_IDLE,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/enemy-idle.anim", 
+                             Animation.class
+                        ), true
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_WALKING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/enemy-walk.anim", 
+                             Animation.class
+                        ), true
+                )
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_JUMPING,
+                null
+        );
+        
+        creature.setAnimation(
+                Creature.STATUS_CLIMBING,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/enemy-climb.anim", 
+                             Animation.class
+                        ), true
+                )
+        );
+        
+        // Create size and position components
+        Size size = new Size(16, 16);
+        Position pos = new Position(
+            x + size.getWidth()/2,
+            y + size.getHeight()/2
+        );
+
+        // Create entity and add components
+        Entity e = world.createEntity();
+        e.addComponent(pos);
+        e.addComponent(size);
+        e.addComponent(new Velocity(0, 0));
+        e.addComponent(new Gravity(-3.0f, -0.25f));
+        e.addComponent(creature);
+        e.addComponent(new Appearance(creature.getCurrentAnimation(), 1));
+        e.addComponent(new Enemy());
+
+        world.addEntity(e);
+    }
+    
     public void addItem(World world, String aniFile, String t, int x, int y) {
         // Get the animation
         Animation ani = assetManager.get(aniFile, Animation.class);
@@ -219,6 +284,33 @@ public class Level {
         // Get the tile dimensions
         tileWidth = (int) terrainLayer.getTileWidth();
         tileHeight = (int) terrainLayer.getTileHeight();
+        
+        // Build pathfinding map
+        buildPathMap();
+    }
+    
+    public void buildPathMap() {
+        pathMap = new int[terrainLayer.getHeight()][terrainLayer.getWidth()];
+        
+        for (int y = 0; y < terrainLayer.getHeight(); y++) {
+            for (int x = 0; x < terrainLayer.getWidth(); x++) {
+                if ((isCellSolid(x, y - 1) && !isCellSolid(x, y)) || isCellLadder(x, y)) {
+                    pathMap[y][x] = 1;
+                } else {
+                    pathMap[y][x] = 0;
+                }
+            }
+        }
+        
+        aStarMap = new AStarMap(pathMap);
+    }
+    
+    public int[][] getPathMap() {
+        return pathMap;
+    }
+    
+    public AStarMap getAStarMap() {
+        return aStarMap;
     }
     
     public void render(OrthographicCamera cam) {
