@@ -113,9 +113,14 @@ public class AStarMap {
         
         ArrayList<AStarNode> pathNodes = new ArrayList<AStarNode>();
         AStarNode current = goal;
-        while (current.parent != null) {
+        
+        int count = 0;
+        int max = 36 * 28;
+        
+        while (current.parent != null && count < max) {
             pathNodes.add(current);
             current = current.parent;
+            count++;
         }
         pathNodes.add(start);
         
