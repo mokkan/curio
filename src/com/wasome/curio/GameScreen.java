@@ -65,6 +65,7 @@ public class GameScreen implements Screen {
         );
 
         // Load sounds
+        assetManager.load("assets/sounds/creature.wav", Sound.class);
         assetManager.load("assets/sounds/jump.wav", Sound.class);
         assetManager.load("assets/sounds/collect.wav", Sound.class);
         assetManager.load("assets/sounds/item-pickup.wav", Sound.class);
@@ -86,6 +87,7 @@ public class GameScreen implements Screen {
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
         assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
         assetManager.load("assets/sprites/imp-climb.anim", Animation.class);
+        assetManager.load("assets/sprites/imp-fall.anim", Animation.class);
         assetManager.load("assets/sprites/enemy-idle.anim", Animation.class);
         assetManager.load("assets/sprites/enemy-walk.anim", Animation.class);
         assetManager.load("assets/sprites/enemy-climb.anim", Animation.class);

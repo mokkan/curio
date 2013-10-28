@@ -14,6 +14,7 @@ import com.wasome.curio.GameScreen;
 import com.wasome.curio.Level;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
+import com.wasome.curio.components.Gravity;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Treasure;
@@ -27,7 +28,9 @@ public class MovementSystem extends IntervalEntitySystem {
     private @Mapper ComponentMapper<Creature> creatureMapper;
     private @Mapper ComponentMapper<Appearance> appearanceMapper;
     private @Mapper ComponentMapper<Treasure> treasureMapper;
+    private @Mapper ComponentMapper<Gravity> gravityMapper;
     private ImmutableBag<Entity> treasureEntities;
+    private ImmutableBag<Entity> enemyEntities;
     private Level level;
     private Entity player;
     private GameScreen game;
@@ -44,6 +47,8 @@ public class MovementSystem extends IntervalEntitySystem {
     @Override
     protected void processEntities(ImmutableBag<Entity> entities) {
         player = world.getManager(TagManager.class).getEntity("PLAYER");
+        enemyEntities = world.getManager(GroupManager.class).getEntities("ENEMY");
+        treasureEntities = world.getManager(GroupManager.class).getEntities("TREASURE");
         
         for (int i = 0, s = entities.size(); s > i; i++) {
             process(entities.get(i));
@@ -51,12 +56,22 @@ public class MovementSystem extends IntervalEntitySystem {
     }
 
     protected void process(Entity e) {
-        if (e.getId() != player.getId()) {
+        if (player == null || e.getId() != player.getId()) {
             return;
         }
         
+        Creature creature = creatureMapper.get(e);
         Position pos = positionMapper.get(e);
-        Velocity vel = velocityMapper.get(e);        
+        Velocity vel = velocityMapper.get(e);   
+        
+        if (creature.getStatus() == Creature.STATUS_DEAD) {
+            if (pos.getY() < 0) {
+                player.deleteFromWorld();
+            } else {
+                pos.addY(vel.getY());
+            }
+            return;
+        }
 
         float oldX = pos.getX(), oldY = pos.getY();
         boolean collisionX = false, collisionY = false;
@@ -96,7 +111,10 @@ public class MovementSystem extends IntervalEntitySystem {
     }
     
     void processPlayer(Entity e) {
-        treasureEntities = world.getManager(GroupManager.class).getEntities("TREASURE");
+        Appearance appearance = appearanceMapper.get(e);
+        Velocity vel = velocityMapper.get(e);
+        Gravity gravity = gravityMapper.get(e);
+        Creature creature = creatureMapper.get(e);
         Position p1 = positionMapper.get(e);
         Size s1 = sizeMapper.get(e);
         Position p2;
@@ -116,6 +134,21 @@ public class MovementSystem extends IntervalEntitySystem {
                 snd.play();
             }
         }
+        
+        for (int i = 0; i < enemyEntities.size(); i++) {
+            Entity enemy = enemyEntities.get(i);
+            p2 = positionMapper.get(enemy);
+            s2 = sizeMapper.get(enemy);
+
+            if (checkCollision(p1, s1, p2, s2) && creature.getStatus() != Creature.STATUS_DEAD) {
+                Sound snd = assetManager.get("assets/sounds/creature.wav", Sound.class);
+                snd.play();
+                creature.setStatus(Creature.STATUS_DEAD);
+                appearance.setAnimation(creature.getCurrentAnimation());
+                vel.setY(3.0f);
+                gravity.setTerminal(-10.0f);
+            }
+        }
     }
     
     public static boolean checkCollision(Position p1, Size s1, Position p2, Size s2) {
@@ -128,7 +161,7 @@ public class MovementSystem extends IntervalEntitySystem {
         float y2 = p2.getY() - s2.getHeight()/2;
         float w2 = s2.getWidth();
         float h2 = s2.getHeight();
-        
+
         return (Math.abs(x1 - x2) * 2 < (w1 + w2)) &&
                 (Math.abs(y1 - y2) * 2 < (h1 + h2));
     }
