@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="38" height="26" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="background" value="cavern.png"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/cavern.tsx"/>
+ <tileset firstgid="36" source="../tilesets/entities.tsx"/>
+ <layer name="Terrain" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+2W3QrCMAyFo95YETYfYI69/0vaMoIjJGzLj0bcgXOxi7YfJ0m7AgB9Ip+rS/UNcukKB9ceWbiG6qfSYyBXpH6N6wTvWbXUg9OW+heB69s5Sud3MN9vj48TzYrKhavVnpp7c01O+1i5MJeLEw/KK687+W68mllFrXFJM03PpFxWeeXV9sn4DmXNi+OiPSBlxPWKdN97cFmEeTW393BLT3B3FH1HLbNIuSyZReYVwaX9dyzwn3lpteTC3tfYslbaL7NfOE6PunAPAAA=
+  </data>
+ </layer>
+ <layer name="Interactive" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA2NgGAWjYPABdjrro7X5I8FdtPYjuWDUXaSBwZCWyDUfm5qBcBe62FByFy0AIXuGiruoZS6l+odyHsWmFhebWgDZTD4S1FLTXaSUAYTUjrqLOHFquYWQWaPuGgXEAADwM8tqcA8AAA==
+  </data>
+ </layer>
+ <layer name="Entities" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+2VUQrAMAhDc5ht9P4n3FehDLdKrdGBgf42T2sNUGLrFE4GMbgi6/3y/QsXY2aOwctL0qxl+AfFNWcAcvSkK8Pf1fqzWEeuRvDLqEwz2iW9f/SOedsnO7g8arugm2vPvGe/mXbPMLmeebDS75Us03papOWSMtHCNcv3aK5muKME3OXWrXhwDwAA
+  </data>
+ </layer>
+</map>

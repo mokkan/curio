@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<animation width="16" height="16" sheet="coin.png">
+  <frame x="0" y="0" time="1000" />
+</animation>
