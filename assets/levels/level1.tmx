@@ -7,17 +7,17 @@
  <tileset firstgid="36" source="../tilesets/entities.tsx"/>
  <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2WwQqAIBBEN7tkBBWdq///y5QQZNPU3NJgB+bSYXuM45YEgKkyS+Ue6lMHzGVrVd4c3gtzhcR5pYnzSpPm0jvMxR7r/TI1rD/nxf2K11dcvnx85u92mkJ7QsCzPUDBdZfX8BUIUohrefn9DZxn0qLnpftleoQZKLhcOyC2kyOc//PzDZeZX6LnWKXP0adcLp0x7iyFKPLSM4RlCk5zH0SGpcM584wP0N0pSHAPAAA=
+   H4sIAAAAAAAAA+1VQQ6AIAwbeBHjQR+g/v+XsoMJJqOgI4qGJj04wih1G46IpsroPAeqDz01XSEWzxWw/cczml/X8GW/WBvSnuIW5Fsuxr7oV6uvfDzll+SPFWI1+DWCtTff7ZQuNCfYa9TzqW+NLuQX2qvF33QZz7mQBqkfJyGW6kcD9OacmVNfCLG657uU8uqurifnRO4brp2rnLNT7I+hhF+cwwYsofOoL6ugE6jJd+TcAYcD+TFwDwAA
   </data>
  </layer>
  <layer name="Interactive" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2VOwoAIAxD3bp5/+O6ithijPjBPBBEkvqcTEkIHjst4CAvDHlhRF6MM/teea3r/+qFzDdnj7LLKwMzRu+c9WJy8sJy8uJzbec1L6tWNLeXOe3l9Uf/iVu9onPW6yYKyeuqV3APAAA=
+   H4sIAAAAAAAAA+3SwQoAIAgDUG/e+v/P7V5kjRUGbqcwlRdkpih8PBuwiFxY5JrTgrvIxZjZ98p1b76qC9nvizOaii6mTy6sTy6+b5xhXae13T65MMtPrqj+4t9npQPOmj2GcA8AAA==
   </data>
  </layer>
  <layer name="Entities" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3OwQkAIAwAsQ6j7j+iMxQplpLA/S8C6GQ/5CvXKn4Deju/BwAY7wJDqguVcA8AAA==
+   H4sIAAAAAAAAA2NgGAWDHagiYXS+Ki5NIxiMhhdpgNTwUiWRpgcg1U0wWgXNDGLSyGj6Ig2MhhdpAF94jQIIICYsyA0vbOGPThMqG2nhLkrAcHeXGqUOwWInoXKLluGlQUWzRnp5i83v1A6TwRq+9HAPOf4ebOFELwAAZss3RnAPAAA=
   </data>
  </layer>
 </map>

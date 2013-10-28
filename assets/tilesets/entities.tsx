@@ -18,4 +18,9 @@
    <property name="item" value="key"/>
   </properties>
  </tile>
+  <tile id="4">
+  <properties>
+   <property name="enemy" value=""/>
+  </properties>
+ </tile>
 </tileset>
