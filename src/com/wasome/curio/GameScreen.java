@@ -57,8 +57,11 @@ public class GameScreen implements Screen {
     private boolean levelComplete = false;
     private ShapeRenderer shape;
     private Color winScreenColor = new Color(0.0f, 0.0f, 0.0f, 0.5f);
+    private Curio curio;
 
     public GameScreen(Curio game) {
+        curio = game;
+        
         // Create shape renderer
         shape = new ShapeRenderer();
         
@@ -371,6 +374,7 @@ public class GameScreen implements Screen {
         String levelFile = "assets/levels/level" + Integer.toString(levelNum) + ".tmx";
         FileHandle fh = new FileHandle(levelFile);
         if (!fh.exists()) {
+            goToTitle();
             levelNum -= 1;
             return;
         }
@@ -411,6 +415,11 @@ public class GameScreen implements Screen {
     
     public void setItem(InventoryItem item) {
         this.item = item;
+    }
+    
+    public void goToTitle() {
+        Gdx.input.setInputProcessor(null);
+        curio.setScreen(new TitleScreen(curio));
     }
     
     @Override

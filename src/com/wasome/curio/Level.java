@@ -42,7 +42,7 @@ public class Level {
     private int tileHeight;
     private int[][] pathMap;
     private AStarMap aStarMap;
-    private int totalTreasure = 0;
+    private int totalTreasure;
     
     public Level(TiledMap map, AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -292,6 +292,7 @@ public class Level {
     
     public void setMap(TiledMap map) {
         this.map = map;
+        totalTreasure = 0;
         
         // Create the map renderer
         renderer = new OrthogonalTiledMapRenderer(map, 1);

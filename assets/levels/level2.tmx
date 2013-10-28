@@ -7,12 +7,12 @@
  <tileset firstgid="36" source="../tilesets/entities.tsx"/>
  <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2W0QrCMAxFw0RYRdDhsw79/4+0AYMhtGu7JiMOL+RhkK6naZImAMDVmYVoJ/CnEX6f6x5tiPYo2OHj/xRrU76zAhdU+mrE3wOXjGVgVrobssmAKyWLvN8DF79DXgNruGQ+YI3ynjgt+JbqsIdLyqL//bnaVOK6wPcd7ekd2lyk28r/5/K+VAd7eLe3VIorF3s+S1DccWZ4iXWpmSMocOV07vAbK9dyf851bNyv1q+Xa2lvKy66/5l9y/neiov6YO4dldoqXq2SXHiuVC3SGbVmx1YuL0IuzLHBmSHTG33MoutwDwAA
+   H4sIAAAAAAAAA+2W0QrDMAhFpWOwjEFb9ryV7f8/chEmE0liUpOSll3wIVTbU2OMDgCmzsx5u0J/usD+uR7eBm9PxU5f/5eIDfkuFbgg07dG/nvgkrl0zLS9IZsbcIXUou6PwMX3kJ+BNVyyHvCM8p44J3y1c2jhkmrR//5cZdK4Rvjdo5beUZuLdF/5/ljda+fgCPf2lgpxxXLPZwnKO84MbxEnZw5c04xh4YrpZvDLjSVJrnPh93L9rFyp+FZctP8LW8v5vhUX9cHYPSq1Vb5KJbnwv2K9b0o8q93/e+5fWGNDZ4ZMH4anWW1wDwAA
   </data>
  </layer>
  <layer name="Interactive" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2WwQ7AIAhDuXHb/3+ud7NlhcocsT2RWMqLB9FMOklOeJDerL7iugJeNJvhuvOsumdxxZThyp4xXjZPXLG8jlyVbzUzu4ILzRRXLHP2vfWx+1lc3DzUt5PLH2okv/Jf2pFrpzpw/VEDOWWhYXAPAAA=
+   H4sIAAAAAAAAA+2UMRaAIAxD2dy4/3HdeaJJQxElWUk/H4aW4uyUQ+ggs9HM8qpEF2UrXledUf9sLy4Rr+iZ0lV59uJ4X/TK3NXK3RleKNNeHLPtPc0h+3PEW+2F8Xu9N73uGNleKPsvXiw/Oreq14o5AQhq1DlwDwAA
   </data>
  </layer>
  <layer name="Entities" width="38" height="26">

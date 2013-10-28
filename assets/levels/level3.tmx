@@ -7,7 +7,7 @@
  <tileset firstgid="36" source="../tilesets/entities.tsx"/>
  <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA81VQQ4DIQikPS099QNt0/9/snogSygoKrWQTOLBdcZhFhEA7smABTfIVwecuh4Fz4LXJm7ik6j8Wf3iuiz92n1WSuORZ/I+ZqqsfZzxa6bfo/9UZr/w3yKUkn61ZsrOmsnX21i3MuTNJCFzvjLq0vySns9ma+W9jfLLq4Hy2Msbgn9OeN61qMqar2hd3rnRK6mL9yq6R/Xsq4DFsXt+0bvX4119Hy/w7UELCGO6+HeatxY/LkA7j7jlXusOh7L3F2jxRfviBfdklw+jva3rD99DjC5wDwAA
+   H4sIAAAAAAAAA81VQRLDIAikPYWc+oG00/9/MnpgwhBUVGphZiceEnddNoIA8AoGTNghXm1w6ToS3gmfRdzEJ5H5o/rFdZX0a+eZKY1H7sn7GKmi9nHEr5F+9/5Tkf3Cf4tQSvpVu1NWVk++vuIp17UMWTNJiJyviLo0v6Tno9mambdeflk1UB5beUOw3xOWueZVUfPlrct6b7RK6uK98u5R3vspUOJYfX/R3Gvxzs7HB9w9qAGhTxf/TvO2xI8T0PYjbvlu6Qyb8u4vUOPz9sUK7skqH3p7m9cndUeTv3APAAA=
   </data>
  </layer>
  <layer name="Interactive" width="38" height="26">

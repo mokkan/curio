@@ -146,6 +146,10 @@ public class MovementSystem extends IntervalEntitySystem {
             Entity enemy = enemyEntities.get(i);
             p2 = positionMapper.get(enemy);
             s2 = sizeMapper.get(enemy);
+            s1.setWidth(12);
+            s1.setHeight(12);
+            s2.setWidth(2);
+            s2.setHeight(2);
 
             if (checkCollision(p1, s1, p2, s2) && creature.getStatus() != Creature.STATUS_DEAD) {
                 Sound snd = assetManager.get("assets/sounds/creature.wav", Sound.class);
@@ -154,8 +158,17 @@ public class MovementSystem extends IntervalEntitySystem {
                 appearance.setAnimation(creature.getCurrentAnimation());
                 vel.setY(3.0f);
                 gravity.setTerminal(-10.0f);
+                s1.setWidth(16);
+                s1.setHeight(16);
+                s2.setWidth(16);
+                s2.setHeight(16);
                 return;
             }
+            
+            s1.setWidth(16);
+            s1.setHeight(16);
+            s2.setWidth(16);
+            s2.setHeight(16);
         }
     }
     

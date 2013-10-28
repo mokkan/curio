@@ -67,6 +67,10 @@ public class InputSystem extends IntervalEntitySystem
     public boolean keyDown(int keycode) {
         player = world.getManager(TagManager.class).getEntity("PLAYER");
         
+        if (keycode == Keys.BACKSPACE) {
+            game.goToTitle();
+        }
+        
         if (keycode == Keys.R) {
             game.resetLevel();
             return true;
