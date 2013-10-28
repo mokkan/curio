@@ -88,12 +88,19 @@ public class MovementSystem extends IntervalEntitySystem {
             pos.setX(oldX);
         }
         
-        pos.addY(vel.getY());
-        
         if (vel.getY() < 0) {
-            collisionY = checkBottomCollisions(e);
-        } else if (vel.getY() > 0) {
-            collisionY = checkTopCollisions(e);
+            for (float vy = vel.getY(); vy < 0; vy += 0.25f) {
+                pos.addY(-0.25f);
+                collisionY = checkBottomCollisions(e);
+            }
+        } else {
+            pos.addY(vel.getY());
+            
+            if (vel.getY() < 0) {
+                collisionY = checkBottomCollisions(e);
+            } else if (vel.getY() > 0) {
+                collisionY = checkTopCollisions(e);
+            } 
         }
         
         if (collisionY) {
@@ -280,9 +287,13 @@ public class MovementSystem extends IntervalEntitySystem {
         
         for (int x = tileL; x <= tileR; x++) {
             
-            // Split these cases up to make more readable. Top case is test for
-            // when ladders are present (allows for climbing). Second case is
-            // when there is no ladder (standard case).
+            // Split these cases up to make more readable. First case is for
+            // when player is jumping. Second case is test for when ladders are 
+            // present (allows for climbing). Third case is when there is no
+            // ladder (standard case).
+            if (level.isCellSolid(x, tileBot) && creature.getStatus() == Creature.STATUS_JUMPING) {
+                return true;
+            } else
             if (level.isCellSolid(x, tileBot) && level.isCellLadder(x, tileBot)
                     && bby1 >= (tileBot+1) * level.getTileHeight() - 1
                     && creature.getStatus() != Creature.STATUS_CLIMBING) {
