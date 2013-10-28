@@ -142,6 +142,16 @@ public class Level {
                 )
         );
         
+        creature.setAnimation(
+                Creature.STATUS_DEAD,
+                new AnimationState(
+                        assetManager.get(
+                            "assets/sprites/imp-fall.anim", 
+                             Animation.class
+                        ), true
+                )
+        );
+        
         // Create size and position components
         Size size = new Size(16, 16);
         Position pos = new Position(
@@ -225,6 +235,11 @@ public class Level {
                 )
         );
         
+        creature.setAnimation(
+                Creature.STATUS_DEAD,
+                null
+        );
+        
         // Create size and position components
         Size size = new Size(16, 16);
         Position pos = new Position(
@@ -242,6 +257,8 @@ public class Level {
         e.addComponent(new Appearance(creature.getCurrentAnimation(), 1));
         e.addComponent(new Enemy());
 
+        world.getManager(GroupManager.class).add(e, "ENEMY");
+        
         world.addEntity(e);
     }
     

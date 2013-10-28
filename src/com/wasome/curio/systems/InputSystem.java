@@ -65,6 +65,13 @@ public class InputSystem extends IntervalEntitySystem
 
     @Override
     public boolean keyDown(int keycode) {
+        player = world.getManager(TagManager.class).getEntity("PLAYER");
+        
+        if (keycode == Keys.R) {
+            game.resetLevel();
+            return true;
+        }
+        
         if (player == null) {
             return true;
         }
@@ -75,6 +82,10 @@ public class InputSystem extends IntervalEntitySystem
         Creature creature = creatureMapper.get(player);
         Size size = sizeMapper.get(player);
         Appearance appearance = appearanceMapper.get(player);
+        
+        if (creature.getStatus() == Creature.STATUS_DEAD) {
+            return true;
+        }
         
         int status = creature.getStatus();
         int tileW = level.getTileWidth();

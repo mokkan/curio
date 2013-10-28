@@ -3,7 +3,6 @@
 + **[7]** Add loading screen for main game state
 + **[17]** Add environmental hazards
 + **[21]** Add border around play field
-+ **[22]** Add player death
 
 
 ## Resolved Issues ##
@@ -26,3 +25,4 @@
 + **[18]** Revise tilemap layering, add new level 1 tileset
 + **[19]** Add level backgrounds
 + **[20]** Add "dead space" background
++ **[22]** Add player death

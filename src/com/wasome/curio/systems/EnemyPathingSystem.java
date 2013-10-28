@@ -39,15 +39,16 @@ public class EnemyPathingSystem extends IntervalEntityProcessingSystem {
     @Override
     protected void process(Entity e) {
         Entity player = world.getManager(TagManager.class).getEntity("PLAYER");
+        Enemy enemy = enemyMapper.get(e);
         
         if (player == null) {
+            enemy.setPath(null);
             return;
         }
         
         AStarMap map = level.getAStarMap();
         Position pos = positionMapper.get(e);
         Position playerPos = positionMapper.get(player);
-        Enemy enemy = enemyMapper.get(e);
 
         int playerTileX = (int) playerPos.getX() / level.getTileWidth();
         int playerTileY = (int) playerPos.getY() / level.getTileHeight();
