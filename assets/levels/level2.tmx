@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="38" height="26" tilewidth="16" tileheight="16">
  <properties>
-  <property name="background" value="cavern.png"/>
+  <property name="background" value="cogs.png"/>
  </properties>
- <tileset firstgid="1" source="../tilesets/cavern.tsx"/>
+ <tileset firstgid="1" source="../tilesets/steampunk.tsx"/>
  <tileset firstgid="36" source="../tilesets/entities.tsx"/>
  <layer name="Terrain" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+2W3QrCMAyFo0PYZKDD6ym+/0va4gKhJG3TnxnFA+cubb+mTdoDAFyNeXA+gz3NYJdryoxdnY/O94QHYSwX+4hwafKVE9si/xa4wlxOm0dInw166cDFad7cUr/ARc+Q1kAJV3gffI3SnrhEYlN1WMMVqkf/+3PplOK6wPvO+H5S0ztac6FuhfNL9z5VBz36RAt9E5eUe/qX4PrPysTRN6+WKxZbGjdmjqVz0HlOyvVy42q5Ymv34sLzx7vx3JEL+6D0jnJz7MGlVcjl98XVIu6x1d9Ry2VFnknK0Sftc/4CAuwI8nAPAAA=
+   H4sIAAAAAAAAA+2W0QrCMAxFw0RYRdDhsw79/4+0AYMhtGu7JiMOL+RhkK6naZImAMDVmYVoJ/CnEX6f6x5tiPYo2OHj/xRrU76zAhdU+mrE3wOXjGVgVrobssmAKyWLvN8DF79DXgNruGQ+YI3ynjgt+JbqsIdLyqL//bnaVOK6wPcd7ekd2lyk28r/5/K+VAd7eLe3VIorF3s+S1DccWZ4iXWpmSMocOV07vAbK9dyf851bNyv1q+Xa2lvKy66/5l9y/neiov6YO4dldoqXq2SXHiuVC3SGbVmx1YuL0IuzLHBmSHTG33MoutwDwAA
   </data>
  </layer>
  <layer name="Interactive" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+2WMQ4AIAgD2dz8/3P9gQEKIqE3QzlNDIqQSSygRtPr5ZXXNtRqsxGvijully37NjPKJ/pc9KrJ+8Ur850g+RleEZn0wvvQ/Uwv27yOXsguzfyXdvSqhF4+DhJK391wDwAA
+   H4sIAAAAAAAAA+2WwQ7AIAhDuXHb/3+ud7NlhcocsT2RWMqLB9FMOklOeJDerL7iugJeNJvhuvOsumdxxZThyp4xXjZPXLG8jlyVbzUzu4ILzRRXLHP2vfWx+1lc3DzUt5PLH2okv/Jf2pFrpzpw/VEDOWWhYXAPAAA=
   </data>
  </layer>
  <layer name="Entities" width="38" height="26">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+WWSwqAMAxEs9R7qHj/E0oXhTKkzaeRFB0o1l941klSov/qbMZb8TXHEdct3C/a5zDDhFxbIktVWb8e15FC1Nfsekl+xnta789wncywcvXe9XKhJ7xcPa3ge05f44qq3dH1f1S7rTGI4nxvFfJjrmRxWaXlens/gNL2bWk/MHre8z0r/EfOaxlcuHYrcHE5WL1h5Rp5w+KdtqdKcSUuqSdz8wgVLszJNt8q0wXn7dxT+zlP4X41Y48fzTXTDz1c3kHG65p4VQ/luPFScA8AAA==
+   H4sIAAAAAAAAA+2W3QrAIAiFe5g19v5POLoIRHRWqDujHZCMwL7MfkrZV5VYVPyRVvK7XUrcSO5VIXK1/GlcRz5OqKz887GMvaqCzXJF1JUH1693hbofHlw0Bsoa+VlB4fIS4vvVpHFZ9zzqekaEWmsIXNL8EVyzteM1v/UmS36GOtPJ+tR/+rfvLq+cSLX+lXvuBqKlktVwDwAA
   </data>
  </layer>
 </map>

@@ -8,12 +8,16 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.wasome.curio.sprites.Animation;
@@ -49,9 +53,16 @@ public class GameScreen implements Screen {
     private InventoryItem item = null;
     final protected static int gameWidth = 640;
     final protected static int gameHeight = 480;
-    private String levelFile = "";
+    private int levelNum = 1;
+    private boolean levelComplete = false;
+    private ShapeRenderer shape;
+    private Color winScreenColor = new Color(0.0f, 0.0f, 0.0f, 0.5f);
 
     public GameScreen(Curio game) {
+        // Create shape renderer
+        shape = new ShapeRenderer();
+        
+        // Create asset manager
         assetManager = new AssetManager();
         
         // Set the tile map loader for the asset manager
@@ -104,7 +115,7 @@ public class GameScreen implements Screen {
         uiBgHeight = uiBg.getHeight();
         
         // Load level 1
-        levelFile = "assets/levels/level1.tmx";
+        String levelFile = "assets/levels/level" + Integer.toString(levelNum) + ".tmx";
         assetManager.load(levelFile, TiledMap.class);
         assetManager.finishLoading();
         level = new Level((TiledMap) assetManager.get(levelFile), assetManager);
@@ -157,7 +168,15 @@ public class GameScreen implements Screen {
     }
     
     public void resetLevel() {
+        item = null;
+        levelComplete = false;
+        String levelFile = "assets/levels/level" + Integer.toString(levelNum) + ".tmx";
         level = new Level((TiledMap) assetManager.get(levelFile), assetManager);
+        
+        String bgFile = level.getBackground();
+        assetManager.load("assets/backgrounds/" + bgFile, Texture.class);
+        assetManager.finishLoading();
+        levelBg = assetManager.get("assets/backgrounds/" + bgFile);
         
         inputSystem = new InputSystem(this, level);
         renderingSystem = new RenderingSystem(cam);
@@ -267,6 +286,111 @@ public class GameScreen implements Screen {
         // Undo our translates
         cam.translate(16 + horizTrans, 48 + vertTrans);
         cam.update();
+        
+        // Draw victory screen if applicable
+        if (levelComplete) {
+            Gdx.gl.glEnable(GL10.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+            shape.setProjectionMatrix(cam.combined);
+            shape.setColor(winScreenColor);
+            shape.begin(ShapeType.Filled);
+            shape.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            shape.end();
+            Gdx.gl.glDisable(GL10.GL_BLEND);
+            
+            String completeTxt = "Level " + Integer.toString(levelNum)
+                               + " Completed!";
+            
+            String collected = "Treasure collected: $"
+                             + score + " / $" + level.getTotalTreasure();
+            
+            String levelGrade = "Performance: " + getLevelGrade();
+            
+            String continueTxt = "Press 'Enter' to continue...";
+            
+            float yOffset = -32;
+            
+            batch.begin();
+            
+            fontBounds = font.getBounds(completeTxt);
+            font.draw(batch, completeTxt, (gameWidth / 2) - fontBounds.width/2, gameHeight/2 - fontBounds.height/2 - yOffset);
+            yOffset += fontBounds.height + 16;
+            
+            fontBounds = font.getBounds(collected);
+            font.draw(batch, collected, (gameWidth / 2) - fontBounds.width/2, gameHeight/2 - fontBounds.height/2 - yOffset);
+            yOffset += fontBounds.height + 16;
+            
+            fontBounds = font.getBounds(levelGrade);
+            font.draw(batch, levelGrade, (gameWidth / 2) - fontBounds.width/2, gameHeight/2 - fontBounds.height/2 - yOffset);
+            yOffset += fontBounds.height + 32;
+            
+            fontBounds = font.getBounds(continueTxt);
+            font.draw(batch, continueTxt, (gameWidth / 2) - fontBounds.width/2, gameHeight/2 - fontBounds.height/2 - yOffset);
+            
+            batch.end();
+        }
+    }
+    
+    private String getLevelGrade() {
+        float ratio = (float) score / level.getTotalTreasure();
+
+        if (ratio > 0.99) {
+            return "A++ SUPERSTAR";
+        } else if (ratio > 0.97) {
+            return "A+";
+        } else if (ratio > 0.93) {
+            return "A";
+        } else if (ratio > 0.90) {
+            return "A-";
+        } else if (ratio > 0.87) {
+            return "B+";
+        } else if (ratio > 0.83) {
+            return "B";
+        } else if (ratio > 0.80) {
+            return "B-";
+        } else if (ratio > 0.77) {
+            return "C+";
+        } else if (ratio > 0.73) {
+            return "C";
+        } else if (ratio > 0.70) {
+            return "C-";
+        } else if (ratio > 0.67) {
+            return "D+";
+        } else if (ratio > 0.63) {
+            return "D";
+        } else if (ratio > 0.60) {
+            return "D-";
+        } else {
+            return "F";
+        }
+    }
+    
+    public void nextLevel() {
+        score = 0;
+        levelNum += 1;
+        String levelFile = "assets/levels/level" + Integer.toString(levelNum) + ".tmx";
+        FileHandle fh = new FileHandle(levelFile);
+        if (!fh.exists()) {
+            levelNum -= 1;
+            return;
+        }
+        
+        assetManager.load(levelFile, TiledMap.class);
+        assetManager.finishLoading();
+        resetLevel();
+    }
+    
+    public boolean getLevelComplete() {
+        return levelComplete;
+    }
+    
+    public void setLevelComplete(boolean levelComplete) {
+        EnemyMovementSystem es = world.getSystem(EnemyMovementSystem.class);
+        if (es != null) {
+            es.stopAnimations();
+            world.deleteSystem(es);
+        }
+        this.levelComplete = levelComplete;
     }
     
     public AssetManager getAssetManager() {

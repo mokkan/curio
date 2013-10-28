@@ -4,7 +4,9 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Mapper;
+import com.artemis.managers.GroupManager;
 import com.artemis.systems.IntervalEntityProcessingSystem;
+import com.artemis.utils.ImmutableBag;
 import com.wasome.curio.Level;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
@@ -164,6 +166,16 @@ public class EnemyMovementSystem extends IntervalEntityProcessingSystem {
         
         pos.addX(vel.getX());
         pos.addY(vel.getY());
+    }
+    
+    public void stopAnimations() {
+        Appearance appearance;
+        ImmutableBag<Entity> enemies = world.getManager(GroupManager.class).getEntities("ENEMY");
+        for (int i = 0; i < enemies.size(); i++) {
+            Entity enemy = enemies.get(i);
+            appearance = appearanceMapper.get(enemy);
+            appearance.getAnimation().pause();
+        }
     }
 
 }

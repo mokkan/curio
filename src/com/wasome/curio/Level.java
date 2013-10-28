@@ -42,6 +42,7 @@ public class Level {
     private int tileHeight;
     private int[][] pathMap;
     private AStarMap aStarMap;
+    private int totalTreasure = 0;
     
     public Level(TiledMap map, AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -194,6 +195,9 @@ public class Level {
         world.getManager(GroupManager.class).add(e, "TREASURE");
         
         world.addEntity(e);
+        
+        // Add to total treasure
+        totalTreasure += v;
     }
     
     public void addEnemy(World world, int x, int y) {
@@ -404,6 +408,10 @@ public class Level {
         }
         
         return cell.getTile().getProperties();
+    }
+    
+    public int getTotalTreasure() {
+        return totalTreasure;
     }
     
 }
