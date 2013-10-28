@@ -7,12 +7,10 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Curio extends Game {
 
-    private GameScreen gameScreen;
-    
     @Override
     public void create() {
-        gameScreen = new GameScreen(this);
-        setScreen(gameScreen);
+        TitleScreen titleScreen = new TitleScreen(this);
+        setScreen(titleScreen);
     }
     
     public static void main(String[] args) {

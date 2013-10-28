@@ -67,8 +67,24 @@ public class InputSystem extends IntervalEntitySystem
     public boolean keyDown(int keycode) {
         player = world.getManager(TagManager.class).getEntity("PLAYER");
         
+        if (keycode == Keys.BACKSPACE) {
+            game.goToTitle();
+        }
+        
         if (keycode == Keys.R) {
             game.resetLevel();
+            return true;
+        }
+        
+        if (keycode == Keys.EQUALS) {
+            game.nextLevel();
+            return true;
+        }
+        
+        if (game.getLevelComplete()) {
+            if (keycode == Keys.ENTER) {
+                game.nextLevel();
+            }
             return true;
         }
         
@@ -163,7 +179,7 @@ public class InputSystem extends IntervalEntitySystem
             }
 
             if (item.getType().equals("key")) {
-                if (level.isCellDoor(tileX, tileY)) {
+                if (level.isCellDoor(tileX, tileY) && !game.getLevelComplete()) {
                     String animFile = "assets/sprites/"
                                     + level.getTileProperties(
                         Level.LAYER_INTERACTIVE,
@@ -184,6 +200,8 @@ public class InputSystem extends IntervalEntitySystem
                     
                     Sound snd = assetManager.get("assets/sounds/door-open.wav", Sound.class);
                     snd.play();
+                    
+                    game.setLevelComplete(true);
                 }
             }
         }

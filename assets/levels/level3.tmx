@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="38" height="26" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="background" value="hell.png"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/hell.tsx"/>
+ <tileset firstgid="36" source="../tilesets/entities.tsx"/>
+ <layer name="Terrain" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA81VQRLDIAikPYWc+oG00/9/MnpgwhBUVGphZiceEnddNoIA8AoGTNghXm1w6ToS3gmfRdzEJ5H5o/rFdZX0a+eZKY1H7sn7GKmi9nHEr5F+9/5Tkf3Cf4tQSvpVu1NWVk++vuIp17UMWTNJiJyviLo0v6Tno9mambdeflk1UB5beUOw3xOWueZVUfPlrct6b7RK6uK98u5R3vspUOJYfX/R3Gvxzs7HB9w9qAGhTxf/TvO2xI8T0PYjbvlu6Qyb8u4vUOPz9sUK7skqH3p7m9cndUeTv3APAAA=
+  </data>
+ </layer>
+ <layer name="Interactive" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+2Uuw4AEAxFu9n8/+daDai+uKFnElr3RKREiYUCmonqxfV4elvuSq/Y3ln9aD+94rys/wfNK3rupdeZHK85V4U5UqLej7vXeq7lVa/dmh2851yZrKV5v3ih5WlZZaN63QTVq6cBIpV+kHAPAAA=
+  </data>
+ </layer>
+ <layer name="Entities" width="38" height="26">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA92XwQ7AIAhD+Zht8f+/cLt4WSrBBVvZSzx4kSIFo9n+XOR47VknWBVoxFiM+0Hnqusxylmpy/Mr2pvV8XQVvPqzeiW7X5BvOpFZ4+Ws7mMWqN9GfeqdEbmrGY8xdc0QnU8rdFV771lkzZBsVtUKvad/9oQiz8PRoNT1Rh1/xK66lDD/P1+4AWaIF3RwDwAA
+  </data>
+ </layer>
+</map>
