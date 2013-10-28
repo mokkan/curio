@@ -19,6 +19,8 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationLoader;
 import com.wasome.curio.sprites.AnimationState;
+import com.wasome.curio.systems.EnemyMovementSystem;
+import com.wasome.curio.systems.EnemyPathingSystem;
 import com.wasome.curio.systems.GravitySystem;
 import com.wasome.curio.systems.InputSystem;
 import com.wasome.curio.systems.MovementSystem;
@@ -84,6 +86,9 @@ public class GameScreen implements Screen {
         assetManager.load("assets/sprites/imp-walk.anim", Animation.class);
         assetManager.load("assets/sprites/imp-jump.anim", Animation.class);
         assetManager.load("assets/sprites/imp-climb.anim", Animation.class);
+        assetManager.load("assets/sprites/enemy-idle.anim", Animation.class);
+        assetManager.load("assets/sprites/enemy-walk.anim", Animation.class);
+        assetManager.load("assets/sprites/enemy-climb.anim", Animation.class);
         assetManager.finishLoading();
         
         // Load interface background
@@ -130,6 +135,8 @@ public class GameScreen implements Screen {
         world.setSystem(inputSystem);
         world.setSystem(new MovementSystem(this, assetManager, level));
         world.setSystem(new GravitySystem());
+        world.setSystem(new EnemyPathingSystem(level));
+        world.setSystem(new EnemyMovementSystem(level));
         
         world.initialize();
         

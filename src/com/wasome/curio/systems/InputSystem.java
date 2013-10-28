@@ -87,19 +87,19 @@ public class InputSystem extends IntervalEntitySystem
         int newDir = 0;
         
         if (keycode == Keys.LEFT) {
+            creature.getAnimation(Creature.STATUS_IDLE).flip(false, false);
+            creature.getAnimation(Creature.STATUS_WALKING).flip(false, false);
+            creature.getAnimation(Creature.STATUS_JUMPING).flip(false, false);
             v.setX(-1);
             newDir = DIR_LEFT;
         }
         
         if (keycode == Keys.RIGHT) {
-            v.setX(1);
-            newDir = DIR_RIGHT;
-        }
-        
-        if (newDir != 0 && lastDir != newDir) {
             creature.getAnimation(Creature.STATUS_IDLE).flip(true, false);
             creature.getAnimation(Creature.STATUS_WALKING).flip(true, false);
             creature.getAnimation(Creature.STATUS_JUMPING).flip(true, false);
+            v.setX(1);
+            newDir = DIR_RIGHT;
         }
         
         lastDir = newDir != 0 ? newDir : lastDir;

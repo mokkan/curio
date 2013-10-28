@@ -51,6 +51,10 @@ public class MovementSystem extends IntervalEntitySystem {
     }
 
     protected void process(Entity e) {
+        if (e.getId() != player.getId()) {
+            return;
+        }
+        
         Position pos = positionMapper.get(e);
         Velocity vel = velocityMapper.get(e);        
 
@@ -178,6 +182,10 @@ public class MovementSystem extends IntervalEntitySystem {
         // Update appearance
         if (status != creature.getStatus()) {
             appearance.setAnimation(creature.getCurrentAnimation());
+        }
+        
+        if (e.getId() != player.getId()) {
+            System.out.println(creature.getStatus());
         }
     }
     
