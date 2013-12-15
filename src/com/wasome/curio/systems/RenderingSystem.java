@@ -12,6 +12,7 @@ import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.sprites.AnimationState;
+import com.wasome.curio.sprites.Frame;
 
 public class RenderingSystem extends EntitySystem {
     
@@ -77,10 +78,12 @@ public class RenderingSystem extends EntitySystem {
         
         float x = pos.getX() - w / 2;
         float y = pos.getY() - h / 2;
-        
+
+        Frame currentFrame = anim.getCurrentFrame();
+
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
-        batch.draw(anim.getCurrentFrame(), x, y, w, h);
+        batch.draw(currentFrame.getTextureRegion(), x, y, w, h);
         batch.end();
     }
     
