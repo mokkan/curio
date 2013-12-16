@@ -1,6 +1,5 @@
 package com.wasome.curio.sprites;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class AnimationState {
     
@@ -86,8 +85,8 @@ public class AnimationState {
         time -= dt;
     }
     
-    public TextureRegion getCurrentFrame() {
-        return anim.getFrames().get(currentFrame).getTextureRegion();
+    public Frame getCurrentFrame() {
+        return anim.getFrames().get(currentFrame);
     }
     
     public String getPath() {

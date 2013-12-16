@@ -19,6 +19,7 @@ import com.wasome.curio.components.Position;
 import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Treasure;
 import com.wasome.curio.components.Velocity;
+import com.wasome.curio.sprites.Frame;
 
 public class MovementSystem extends IntervalEntitySystem {
 
@@ -133,12 +134,13 @@ public class MovementSystem extends IntervalEntitySystem {
             p2 = positionMapper.get(treasure);
             s2 = sizeMapper.get(treasure);
 
-            if (checkCollision(p1, s1, p2, s2)) {
+            if (checkCollision(p1, s1, p2, s2)
+                    && checkEntityCollision(player, treasure)) {
+                
                 val = treasureMapper.get(treasure).getValue();
                 game.setScore(game.getScore() + val);
                 treasure.deleteFromWorld();
-                Sound snd = assetManager.get("assets/sounds/collect.wav", Sound.class);
-                snd.play();
+                assetManager.get("assets/sounds/collect.wav", Sound.class).play();
             }
         }
         
@@ -146,30 +148,50 @@ public class MovementSystem extends IntervalEntitySystem {
             Entity enemy = enemyEntities.get(i);
             p2 = positionMapper.get(enemy);
             s2 = sizeMapper.get(enemy);
-            s1.setWidth(12);
-            s1.setHeight(12);
-            s2.setWidth(2);
-            s2.setHeight(2);
 
-            if (checkCollision(p1, s1, p2, s2) && creature.getStatus() != Creature.STATUS_DEAD) {
-                Sound snd = assetManager.get("assets/sounds/creature.wav", Sound.class);
-                snd.play();
+            if (checkCollision(p1, s1, p2, s2)
+                    && checkEntityCollision(player, enemy)
+                    && creature.getStatus() != Creature.STATUS_DEAD) {
+                
+                assetManager.get("assets/sounds/creature.wav", Sound.class).play();
                 creature.setStatus(Creature.STATUS_DEAD);
                 appearance.setAnimation(creature.getCurrentAnimation());
                 vel.setY(3.0f);
                 gravity.setTerminal(-10.0f);
-                s1.setWidth(16);
-                s1.setHeight(16);
-                s2.setWidth(16);
-                s2.setHeight(16);
-                return;
             }
-            
-            s1.setWidth(16);
-            s1.setHeight(16);
-            s2.setWidth(16);
-            s2.setHeight(16);
         }
+    }
+    
+    public boolean checkEntityCollision(Entity e1, Entity e2) {
+        Position pos1 = positionMapper.get(e1);
+        Position pos2 = positionMapper.get(e2);
+        Frame f1 = appearanceMapper.get(e1).getAnimation().getCurrentFrame();
+        Frame f2 = appearanceMapper.get(e2).getAnimation().getCurrentFrame();
+        int dx = (int) -(pos2.getX() - pos1.getX());
+        int dy = (int) (pos2.getY() - pos1.getY());
+        int w1 = f1.getTextureRegion().getRegionWidth();
+        int h1 = f1.getTextureRegion().getRegionHeight();
+        int w2 = f1.getTextureRegion().getRegionWidth();
+        int h2 = f1.getTextureRegion().getRegionHeight();
+        boolean[][] m1 = f1.getCollisionMap();
+        boolean[][] m2 = f2.getCollisionMap();
+
+        for (int py1 = 0; py1 < h1; py1++) {
+            for (int px1 = 0; px1 < w1; px1++) {
+                int px2 = px1 + dx;
+                int py2 = py1 + dy;
+                
+                if (px2 >= w2 || px2 < 0 || py2 >= h2 || py2 < 0) {
+                    continue;
+                }
+                
+                if (m1[py1][px1] && m2[py2][px2]) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
     
     public static boolean checkCollision(Position p1, Size s1, Position p2, Size s2) {

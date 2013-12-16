@@ -253,7 +253,7 @@ public class GameScreen implements Screen {
             AnimationState itemAnim = item.getAnimation();
             itemAnim.update(delta);
             batch.begin();
-            batch.draw(itemAnim.getCurrentFrame(), (gameWidth / 2) + fontBounds.width + 16, 16);
+            batch.draw(itemAnim.getCurrentFrame().getTextureRegion(), (gameWidth / 2) + fontBounds.width + 16, 16);
             batch.end();
         } else {
             batch.begin();
