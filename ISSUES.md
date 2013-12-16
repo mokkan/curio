@@ -3,6 +3,7 @@
 + **[7]** Add loading screen for main game state
 + **[17]** Add environmental hazards
 + **[21]** Add border around play field
++ **[25]** Fix scoring system (doesn't reset when map resets)
 
 
 ## Resolved Issues ##
