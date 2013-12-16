@@ -171,6 +171,7 @@ public class GameScreen implements Screen {
     }
     
     public void resetLevel() {
+        score = 0;
         item = null;
         levelComplete = false;
         String levelFile = "assets/levels/level" + Integer.toString(levelNum) + ".tmx";
