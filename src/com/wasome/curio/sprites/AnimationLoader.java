@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 
 public class AnimationLoader extends
+
     AsynchronousAssetLoader<Animation, AnimationLoader.AnimationParameter>  {
     
     public AnimationLoader(FileHandleResolver resolver) {
@@ -30,7 +31,9 @@ public class AnimationLoader extends
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName,
             FileHandle file, AnimationParameter parameter) {
+
         Array<AssetDescriptor> deps = new Array<AssetDescriptor>();
+        String dir = file.parent().path() + "/";
 
         try {
             InputStream in = file.read();
@@ -53,8 +56,7 @@ public class AnimationLoader extends
                         Attribute attr = attributes.next();
                         
                         if (attr.getName().toString() == "sheet") {
-                            String path = "assets/sprites/"
-                                        + attr.getValue().toString();
+                            String path = dir + attr.getValue().toString();
                             deps.add(new AssetDescriptor(path, Texture.class));
                         }
                     }
@@ -78,6 +80,7 @@ public class AnimationLoader extends
             FileHandle file, AnimationParameter parameter) {
         
         Animation anim = null;
+        String dir = file.parent().path()  + "/";
         
         try {
             InputStream in = file.read();
@@ -102,8 +105,7 @@ public class AnimationLoader extends
                             Attribute attr = attributes.next();
                             
                             if (attr.getName().toString() == "sheet") {
-                                String path = "assets/sprites/"
-                                            + attr.getValue().toString();
+                                String path = dir + attr.getValue().toString();
                                 sheet = manager.get(path, Texture.class);
                             } else if (attr.getName().toString() == "width") {
                                 String tmp = attr.getValue().toString();

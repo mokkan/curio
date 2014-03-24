@@ -25,46 +25,52 @@ public class RenderingSystem extends EntitySystem {
     @SuppressWarnings("unchecked")
     public RenderingSystem(OrthographicCamera cam) {
         super(Aspect.getAspectForAll(Position.class, Size.class, 
-                Appearance.class));
-        
+                                     Appearance.class));
         batch = new SpriteBatch();
         this.cam = cam;
     }
     
     @Override
     protected void processEntities(ImmutableBag<Entity> entities) {
-        Appearance appearance;
-
+        batch.setProjectionMatrix(cam.combined);
+        
+        // Render background entities
+        batch.begin();
         for (int i = 0, s = entities.size(); s > i; i++) {
-            appearance = appearanceMapper.get(entities.get(i));
+            Appearance appearance = appearanceMapper.get(entities.get(i));
             
             if (appearance.getOrder() == 0) {
                 update(entities.get(i));
             }
         }
-        
+        batch.end();
+
+        // Render foreground entities
+        batch.begin();
         for (int i = 0, s = entities.size(); s > i; i++) {
-            appearance = appearanceMapper.get(entities.get(i));
+            Appearance appearance = appearanceMapper.get(entities.get(i));
             
             if (appearance.getOrder() == 1) {
                 update(entities.get(i));
             }
         }
+        batch.end();
     }
 
     protected void update(Entity e) {
-        // Get component from the entity using component mapper
         Position pos = positionMapper.get(e);
         Size size = sizeMapper.get(e);
         Appearance appearance = appearanceMapper.get(e);
         AnimationState anim = appearance.getAnimation();
         
+        // Don't need to do anything if animation doesn't exist yet
         if (anim == null) {
             return;
         }
         
         anim.update(world.getDelta() / 1000);
         
+        // Get the appropriate dimensions/coords for the anim (flip/no flip)
         float w = size.getWidth();
         float h = size.getHeight();
         
@@ -79,12 +85,9 @@ public class RenderingSystem extends EntitySystem {
         float x = pos.getX() - w / 2;
         float y = pos.getY() - h / 2;
 
+        // Draw the current frame
         Frame currentFrame = anim.getCurrentFrame();
-
-        batch.setProjectionMatrix(cam.combined);
-        batch.begin();
         batch.draw(currentFrame.getTextureRegion(), x, y, w, h);
-        batch.end();
     }
     
     @Override

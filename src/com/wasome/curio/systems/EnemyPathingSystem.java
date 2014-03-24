@@ -74,12 +74,7 @@ public class EnemyPathingSystem extends IntervalEntityProcessingSystem {
         }
         
         if (path == null) {
-            path = map.getPath(
-                    tileX,
-                    tileY,
-                    tgtX,
-                    tgtY
-                );
+            path = map.getPath(tileX, tileY, tgtX, tgtY);
         }
         
         enemy.setPath(path);

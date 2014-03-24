@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Curio extends Game {
 
+    public static final int GAME_WIDTH = 640;
+    public static final int GAME_HEIGHT = 480;
+    
     @Override
     public void create() {
         TitleScreen titleScreen = new TitleScreen(this);
