@@ -8,24 +8,26 @@ player was located. Enemies are not capable of jumping or falling off of
 platforms. Much of the gameplay is based on outsmarting the enemy AI and
 exploiting its behavior.
 
+![Screenshot](http://i.imgur.com/2fIPtiq.png)
+
 ## Cheat Codes ##
 The equals/plus key next to zero on the keyboard (not numpad) will make the game
 advance to the next level.
 
 ## Controls ##
-Move Player       =  <Left/Right Arrow>
-Climb Ladder      =  <Up/Down Arrow>
-Jump              =  <Spacebar>
+    Move Player       =  Left/Right Arrow
+    Climb Ladder      =  Up/Down Arrow
+    Jump              =  Spacebar
 
-Pick Up Item      =  <Left CTRL>
-Drop Item         =  <Left ALT>
-Use Item          =  <Left SHIFT>
+    Pick Up Item      =  Left CTRL
+    Drop Item         =  Left ALT
+    Use Item          =  Left SHIFT
 
-Restart Level     =  <R>
-Return to Title   =  <Backspace>
+    Restart Level     =  R
+    Return to Title   =  Backspace
 
-Next Level Cheat  =  <Plus/Equals Key>
+    Next Level Cheat  =  Plus/Equals Key
 
 ## License ##
-Curio is distributed under GPL v3 (see LICENSE). Included GDX and Artemis JARs
-are distributed under their respective licenses (see LICENSE files in libs).
+Curio is distributed under the [GPL v3 license](https://www.gnu.org/copyleft/gpl.html).
+Included GDX and Artemis JARs are distributed under their respective licenses (see LICENSE files in libs).
