@@ -1,3 +1,21 @@
+/*
+ * Curio - A simple puzzle platformer game.
+ * Copyright (C) 2014  Michael Swiger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.wasome.curio.systems;
 
 import com.artemis.Aspect;
@@ -10,8 +28,10 @@ import com.artemis.systems.IntervalEntitySystem;
 import com.artemis.utils.ImmutableBag;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.wasome.curio.Collision;
 import com.wasome.curio.GameScreen;
 import com.wasome.curio.Level;
+import com.wasome.curio.Resources;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Gravity;
@@ -20,49 +40,50 @@ import com.wasome.curio.components.Size;
 import com.wasome.curio.components.Treasure;
 import com.wasome.curio.components.Velocity;
 
-public class MovementSystem extends IntervalEntitySystem {
+public class PlayerMovementSystem extends IntervalEntitySystem {
 
-    private @Mapper ComponentMapper<Position> positionMapper;
-    private @Mapper ComponentMapper<Velocity> velocityMapper;
-    private @Mapper ComponentMapper<Size> sizeMapper;
-    private @Mapper ComponentMapper<Creature> creatureMapper;
     private @Mapper ComponentMapper<Appearance> appearanceMapper;
-    private @Mapper ComponentMapper<Treasure> treasureMapper;
+    private @Mapper ComponentMapper<Creature> creatureMapper;
     private @Mapper ComponentMapper<Gravity> gravityMapper;
-    private ImmutableBag<Entity> treasureEntities;
-    private ImmutableBag<Entity> enemyEntities;
+    private @Mapper ComponentMapper<Position> positionMapper;
+    private @Mapper ComponentMapper<Size> sizeMapper;
+    private @Mapper ComponentMapper<Treasure> treasureMapper;
+    private @Mapper ComponentMapper<Velocity> velocityMapper;
+
     private Level level;
-    private Entity player;
     private GameScreen game;
-    private AssetManager assetManager;
-    
-    @SuppressWarnings("unchecked")
-    public MovementSystem(GameScreen game, AssetManager asm, Level level) {
-        super(Aspect.getAspectForAll(Velocity.class, Position.class), 10);
-        this.game = game;
-        this.level = level;
-        this.assetManager = asm;
+    private AssetManager assets;
+
+    public PlayerMovementSystem(GameScreen g, AssetManager assets, Level lvl) {
+        super(Aspect.getEmpty(), 10);
+        this.game = g;
+        this.level = lvl;
+        this.assets = assets;
     }
     
     @Override
     protected void processEntities(ImmutableBag<Entity> entities) {
-        player = world.getManager(TagManager.class).getEntity("PLAYER");
-        enemyEntities = world.getManager(GroupManager.class).getEntities("ENEMY");
-        treasureEntities = world.getManager(GroupManager.class).getEntities("TREASURE");
+        Entity player = world.getManager(TagManager.class).getEntity("PLAYER");
         
-        for (int i = 0, s = entities.size(); s > i; i++) {
-            process(entities.get(i));
-        }
-    }
-
-    protected void process(Entity e) {
-        if (player == null || e.getId() != player.getId()) {
+        if (player == null) { 
             return;
         }
         
-        Creature creature = creatureMapper.get(e);
-        Position pos = positionMapper.get(e);
-        Velocity vel = velocityMapper.get(e);   
+        Creature creature = creatureMapper.get(player);
+        
+        processDeath(player);
+        if (creature.getStatus() != Creature.STATUS_DEAD) {
+            processWorldCollisions(player);
+            updateStatus(player);
+            processEnemyCollisions(player);
+            processTreasureCollisions(player);
+        }
+    }
+    
+    private void processDeath(Entity player) {
+        Creature creature = creatureMapper.get(player);
+        Position pos = positionMapper.get(player);
+        Velocity vel = velocityMapper.get(player);   
         
         if (creature.getStatus() == Creature.STATUS_DEAD) {
             if (pos.getY() < 0) {
@@ -72,16 +93,22 @@ public class MovementSystem extends IntervalEntitySystem {
             }
             return;
         }
-
+    }
+    
+    private void processWorldCollisions(Entity player) {
+        Position pos = positionMapper.get(player);
+        Velocity vel = velocityMapper.get(player);
+        
+        final float dy = 0.25f; // position interval to use for updating y pos
         float oldX = pos.getX(), oldY = pos.getY();
         boolean collisionX = false, collisionY = false;
         
         pos.addX(vel.getX());
         
         if (vel.getX() < 0) {
-            collisionX = checkLeftCollisions(e);
+            collisionX = checkLeftCollisions(player);
         } else if (vel.getX() > 0) {
-            collisionX = checkRightCollisions(e);
+            collisionX = checkRightCollisions(player);
         }
         
         if (collisionX) {
@@ -89,17 +116,17 @@ public class MovementSystem extends IntervalEntitySystem {
         }
         
         if (vel.getY() < 0) {
-            for (float vy = vel.getY(); vy < 0; vy += 0.25f) {
+            for (float vy = vel.getY(); vy < 0; vy += dy) {
                 pos.addY(-0.25f);
-                collisionY = checkBottomCollisions(e);
+                collisionY = checkBottomCollisions(player);
             }
         } else {
             pos.addY(vel.getY());
             
             if (vel.getY() < 0) {
-                collisionY = checkBottomCollisions(e);
+                collisionY = checkBottomCollisions(player);
             } else if (vel.getY() > 0) {
-                collisionY = checkTopCollisions(e);
+                collisionY = checkTopCollisions(player);
             } 
         }
         
@@ -107,84 +134,52 @@ public class MovementSystem extends IntervalEntitySystem {
             pos.setY(oldY);
             vel.setY(0);
         }
-        
-        // Set the status of the creature
-        updateStatus(e);
-        
-        // Run player-specific code
-        if (e.getId() == player.getId()) {
-            processPlayer(e);
-        }
     }
-    
-    void processPlayer(Entity e) {
-        Appearance appearance = appearanceMapper.get(e);
-        Velocity vel = velocityMapper.get(e);
-        Gravity gravity = gravityMapper.get(e);
-        Creature creature = creatureMapper.get(e);
-        Position p1 = positionMapper.get(e);
-        Size s1 = sizeMapper.get(e);
-        Position p2;
-        Size s2;
-        int val;
-        
-        for (int i = 0; i < treasureEntities.size(); i++) {
-            Entity treasure = treasureEntities.get(i);
-            p2 = positionMapper.get(treasure);
-            s2 = sizeMapper.get(treasure);
 
-            if (checkCollision(p1, s1, p2, s2)) {
-                val = treasureMapper.get(treasure).getValue();
-                game.setScore(game.getScore() + val);
-                treasure.deleteFromWorld();
-                Sound snd = assetManager.get("assets/sounds/collect.wav", Sound.class);
-                snd.play();
-            }
-        }
+    private void processEnemyCollisions(Entity player) {
+        GroupManager groups = world.getManager(GroupManager.class);
+        ImmutableBag<Entity> enemyEntities = groups.getEntities("ENEMY");
+        
+        Appearance appearance = appearanceMapper.get(player);
+        Creature creature = creatureMapper.get(player);
+        Gravity gravity = gravityMapper.get(player);
+        Velocity vel = velocityMapper.get(player);
+        
+        Sound snd = assets.get(Resources.SND_DEATH, Sound.class);
         
         for (int i = 0; i < enemyEntities.size(); i++) {
             Entity enemy = enemyEntities.get(i);
-            p2 = positionMapper.get(enemy);
-            s2 = sizeMapper.get(enemy);
-            s1.setWidth(12);
-            s1.setHeight(12);
-            s2.setWidth(2);
-            s2.setHeight(2);
 
-            if (checkCollision(p1, s1, p2, s2) && creature.getStatus() != Creature.STATUS_DEAD) {
-                Sound snd = assetManager.get("assets/sounds/creature.wav", Sound.class);
+            if (Collision.boxCollision(player, enemy)
+                    && Collision.pixelCollision(player, enemy)
+                    && creature.getStatus() != Creature.STATUS_DEAD) {
+                
                 snd.play();
                 creature.setStatus(Creature.STATUS_DEAD);
                 appearance.setAnimation(creature.getCurrentAnimation());
                 vel.setY(3.0f);
                 gravity.setTerminal(-10.0f);
-                s1.setWidth(16);
-                s1.setHeight(16);
-                s2.setWidth(16);
-                s2.setHeight(16);
-                return;
             }
-            
-            s1.setWidth(16);
-            s1.setHeight(16);
-            s2.setWidth(16);
-            s2.setHeight(16);
         }
     }
     
-    public static boolean checkCollision(Position p1, Size s1, Position p2, Size s2) {
-        float x1 = p1.getX() - s1.getWidth()/2;
-        float y1 = p1.getY() - s1.getHeight()/2;
-        float w1 = s1.getWidth();
-        float h1 = s1.getHeight();
-        
-        float x2 = p2.getX() - s2.getWidth()/2;
-        float y2 = p2.getY() - s2.getHeight()/2;
-        float w2 = s2.getWidth();
-        float h2 = s2.getHeight();
+    private void processTreasureCollisions(Entity player) {
+        GroupManager groups = world.getManager(GroupManager.class);
+        ImmutableBag<Entity> treasureEntities = groups.getEntities("TREASURE");
+        Sound snd = assets.get(Resources.SND_COLLECT, Sound.class);
 
-        return (Math.abs(x1 - x2) * 2 < (w1 + w2)) &&
-                (Math.abs(y1 - y2) * 2 < (h1 + h2));
+        for (int i = 0; i < treasureEntities.size(); i++) {
+            Entity treasure = treasureEntities.get(i);
+
+            if (Collision.boxCollision(player, treasure)
+                    && Collision.pixelCollision(player, treasure)) {
+                
+                int val = treasureMapper.get(treasure).getValue();
+                game.setScore(game.getScore() + val);
+                treasure.deleteFromWorld();
+                snd.play();
+            }
+        }
     }
     
     private void updateStatus(Entity e) {
@@ -236,10 +231,6 @@ public class MovementSystem extends IntervalEntitySystem {
         // Update appearance
         if (status != creature.getStatus()) {
             appearance.setAnimation(creature.getCurrentAnimation());
-        }
-        
-        if (e.getId() != player.getId()) {
-            System.out.println(creature.getStatus());
         }
     }
     
@@ -299,15 +290,17 @@ public class MovementSystem extends IntervalEntitySystem {
         int tileBot = (int) (bby1 / level.getTileHeight());
         
         for (int x = tileL; x <= tileR; x++) {
-            
             // Split these cases up to make more readable. First case is for
             // when player is jumping. Second case is test for when ladders are 
             // present (allows for climbing). Third case is when there is no
             // ladder (standard case).
-            if (level.isCellSolid(x, tileBot) && creature.getStatus() == Creature.STATUS_JUMPING) {
+            if (level.isCellSolid(x, tileBot)
+                    && creature.getStatus() == Creature.STATUS_JUMPING) {
+
                 return true;
-            } else
-            if (level.isCellSolid(x, tileBot) && level.isCellLadder(x, tileBot)
+            } else if (level.isCellSolid(x, tileBot)
+                           && level.isCellLadder(x, tileBot)
+
                     && bby1 >= (tileBot+1) * level.getTileHeight() - 1
                     && creature.getStatus() != Creature.STATUS_CLIMBING) {
                 

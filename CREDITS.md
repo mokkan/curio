@@ -13,3 +13,6 @@
 
  * "Door Open" by Hitrison (assets/sounds/door-open.wav)
    http://www.freesound.org/people/Hitrison/sounds/198869/
+
+ * "Creature" by fins (assets/sounds/creature.wav)
+   http://www.freesound.org/people/fins/sounds/133277/

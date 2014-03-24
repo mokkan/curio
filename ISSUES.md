@@ -27,3 +27,5 @@
 + **[20]** Add "dead space" background
 + **[22]** Add player death
 + **[23]** Add level win and transition
++ **[24]** Implement more precise collision detection
++ **[25]** Fix scoring system (doesn't reset when map resets)

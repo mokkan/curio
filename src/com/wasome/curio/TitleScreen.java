@@ -1,3 +1,21 @@
+/*
+ * Curio - A simple puzzle platformer game.
+ * Copyright (C) 2014  Michael Swiger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.wasome.curio;
 
 import com.badlogic.gdx.Gdx;
@@ -10,13 +28,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class TitleScreen implements Screen {
 
-    final protected static int gameWidth = 640;
-    final protected static int gameHeight = 480;
     private int camWidth;
     private int camHeight;
     private int zoomFactor;
-    private int uiBgWidth;
-    private int uiBgHeight;
     private OrthographicCamera cam;
     private Texture background;
     private Texture foreground;
@@ -33,35 +47,40 @@ public class TitleScreen implements Screen {
         background = new Texture(Gdx.files.internal("assets/ui/background.png"));
         foreground = new Texture(Gdx.files.internal("assets/ui/title.png"));
         
-        uiBgWidth = background.getWidth();
-        uiBgHeight = background.getHeight();
-        
         // Create camera
-        zoomFactor = Gdx.graphics.getHeight() /  gameHeight;
-        camWidth = Gdx.graphics.getWidth() - ((zoomFactor - 1) * gameWidth);
-        camHeight = Gdx.graphics.getHeight() - ((zoomFactor - 1) * gameHeight);
+        int gfxWidth = Gdx.graphics.getWidth();
+        int gfxHeight = Gdx.graphics.getHeight();
+
+        zoomFactor = gfxHeight / Curio.GAME_HEIGHT;
+        camWidth = gfxWidth - ((zoomFactor - 1) * Curio.GAME_WIDTH);
+        camHeight = gfxHeight - ((zoomFactor - 1) * Curio.GAME_HEIGHT);
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, camWidth, camHeight);
     }
-    
-    @Override
-    public void render(float delta) {
-        // Clear the screen
-        Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        
+
+    private void update() {
         if (Gdx.input.isKeyPressed(Keys.SPACE)) {
             curio.setScreen(new GameScreen(curio));
-            return;
         }
         
         if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
             Gdx.app.exit();
-            return;
         }
+    }
+    
+    @Override
+    public void render(float delta) {
+        update();
+        
+        // Clear the screen
+        Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
+        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         
         // Draw the interface background
+        int uiBgWidth = background.getWidth();
+        int uiBgHeight = background.getHeight();
+        
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
         
@@ -74,16 +93,17 @@ public class TitleScreen implements Screen {
         batch.end();
         
         // Draw the UI
-        int horizTrans = (camWidth - gameWidth) / 2;
-        int vertTrans = (camHeight - gameHeight) / 2;
+        int horizTrans = (camWidth - Curio.GAME_WIDTH) / 2;
+        int vertTrans = (camHeight - Curio.GAME_HEIGHT) / 2;
         
+        float textX = Curio.GAME_WIDTH/2 - foreground.getWidth()/2;
+        float textY = Curio.GAME_HEIGHT/2 - foreground.getHeight()/2;
+
         cam.translate(-horizTrans, -vertTrans);
         cam.update();
         
         batch.setProjectionMatrix(cam.combined);
-        
-        float textX = gameWidth/2 - foreground.getWidth()/2;
-        float textY = gameHeight/2 - foreground.getHeight()/2;
+
         batch.begin();
         batch.draw(foreground, textX, textY);
         batch.end();
@@ -94,39 +114,21 @@ public class TitleScreen implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void resize(int width, int height) {}
 
     @Override
-    public void show() {
-        // TODO Auto-generated method stub
-        
-    }
+    public void show() {}
 
     @Override
-    public void hide() {
-        // TODO Auto-generated method stub
-        
-    }
+    public void hide() {}
 
     @Override
-    public void pause() {
-        // TODO Auto-generated method stub
-        
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-        // TODO Auto-generated method stub
-        
-    }
+    public void resume() {}
 
     @Override
-    public void dispose() {
-        // TODO Auto-generated method stub
-        
-    }
+    public void dispose() {}
 
 }

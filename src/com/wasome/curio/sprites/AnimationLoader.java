@@ -1,3 +1,21 @@
+/*
+ * Curio - A simple puzzle platformer game.
+ * Copyright (C) 2014  Michael Swiger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.wasome.curio.sprites;
 
 import java.io.InputStream;
@@ -20,6 +38,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 
 public class AnimationLoader extends
+
     AsynchronousAssetLoader<Animation, AnimationLoader.AnimationParameter>  {
     
     public AnimationLoader(FileHandleResolver resolver) {
@@ -30,7 +49,9 @@ public class AnimationLoader extends
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName,
             FileHandle file, AnimationParameter parameter) {
+
         Array<AssetDescriptor> deps = new Array<AssetDescriptor>();
+        String dir = file.parent().path() + "/";
 
         try {
             InputStream in = file.read();
@@ -53,8 +74,7 @@ public class AnimationLoader extends
                         Attribute attr = attributes.next();
                         
                         if (attr.getName().toString() == "sheet") {
-                            String path = "assets/sprites/"
-                                        + attr.getValue().toString();
+                            String path = dir + attr.getValue().toString();
                             deps.add(new AssetDescriptor(path, Texture.class));
                         }
                     }
@@ -78,6 +98,7 @@ public class AnimationLoader extends
             FileHandle file, AnimationParameter parameter) {
         
         Animation anim = null;
+        String dir = file.parent().path()  + "/";
         
         try {
             InputStream in = file.read();
@@ -102,8 +123,7 @@ public class AnimationLoader extends
                             Attribute attr = attributes.next();
                             
                             if (attr.getName().toString() == "sheet") {
-                                String path = "assets/sprites/"
-                                            + attr.getValue().toString();
+                                String path = dir + attr.getValue().toString();
                                 sheet = manager.get(path, Texture.class);
                             } else if (attr.getName().toString() == "width") {
                                 String tmp = attr.getValue().toString();

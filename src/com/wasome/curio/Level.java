@@ -1,3 +1,21 @@
+/*
+ * Curio - A simple puzzle platformer game.
+ * Copyright (C) 2014  Michael Swiger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.wasome.curio;
 
 import com.artemis.Entity;
@@ -27,12 +45,13 @@ import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationState;
 
 public class Level {
-    
-    public final static int LAYER_TERRAIN = 0;
-    public final static int LAYER_INTERACTIVE = 1;
-    public final static int LAYER_ENTITIES = 2;
-    private AssetManager assetManager;
+
+    public static final int LAYER_TERRAIN = 0;
+    public static final int LAYER_INTERACTIVE = 1;
+    public static final int LAYER_ENTITIES = 2;
+
     private static final int[] renderLayers = {0, 1};
+    private AssetManager assets;
     private OrthogonalTiledMapRenderer renderer;
     private TiledMap map;
     private TiledMapTileLayer terrainLayer;
@@ -45,7 +64,7 @@ public class Level {
     private int totalTreasure;
     
     public Level(TiledMap map, AssetManager assetManager) {
-        this.assetManager = assetManager;
+        this.assets = assetManager;
         setMap(map);
     }
     
@@ -65,92 +84,73 @@ public class Level {
         if (entitiesLayer == null) {
             return;
         }
-        
-        Cell cell;
-        TiledMapTile tile;
-        MapProperties props;
-        
+
         for (int y = 0; y < entitiesLayer.getHeight(); y++) {
             for (int x = 0; x < entitiesLayer.getWidth(); x++) {
-                cell = entitiesLayer.getCell(x, y);
+                Cell cell = entitiesLayer.getCell(x, y);
+
                 if (cell == null) {
                     continue;
                 }
                 
-                tile = cell.getTile();
-                props = tile.getProperties();
+                String animDir = "assets/sprites/";
+                TiledMapTile tile = cell.getTile();
+                MapProperties props = tile.getProperties();
+                
+                int posX = x * tileWidth;
+                int posY = y * tileHeight;
                 
                 if (props.containsKey("player")) {
-                    addPlayer(world, x * tileWidth, y * tileHeight);
+                    createPlayer(world, posX, posY);
                 } else if (props.containsKey("enemy")) { 
-                    addEnemy(world, x * tileWidth, y * tileHeight);
+                    createEnemy(world, posX, posY);
                 } else if (props.containsKey("treasure")) {
-                    String anim = "assets/sprites/"
-                                + props.get("animation").toString();
                     int v = Integer.parseInt(props.get("treasure").toString());
-                    addTreasure(world, anim, x * tileWidth, y * tileHeight, v);
+                    String anim = animDir + props.get("animation").toString();
+                    createTreasure(world, anim, posX, posY, v);
                 } else if (props.containsKey("item")) {
-                    String anim = "assets/sprites/"
-                            + props.get("animation").toString();
+                    String anim = animDir + props.get("animation").toString();
                     String type = props.get("item").toString();
-                    addItem(world, anim, type, x, y);
+                    createItem(world, anim, type, x, y);
                 }
             }
         }
     }
     
-    private void addPlayer(World world, int x, int y) {
-        // Create creature for player
+    private void createPlayer(World world, int x, int y) {
+        // Get animations for creature
+        Animation idleAnim = assets.get(Resources.ANIM_IMP_IDLE, Animation.class);
+        Animation walkAnim = assets.get(Resources.ANIM_IMP_WALK, Animation.class);
+        Animation jumpAnim = assets.get(Resources.ANIM_IMP_JUMP, Animation.class);
+        Animation climbAnim = assets.get(Resources.ANIM_IMP_CLIMB, Animation.class);
+        Animation fallAnim = assets.get(Resources.ANIM_IMP_FALL, Animation.class);
+        
+        // Create creature for player and set animations
         Creature creature = new Creature();
        
         creature.setAnimation(
                 Creature.STATUS_IDLE,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-idle.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(idleAnim, true)
         );
         
         creature.setAnimation(
                 Creature.STATUS_WALKING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-walk.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(walkAnim, true)
         );
         
         creature.setAnimation(
                 Creature.STATUS_JUMPING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-jump.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(jumpAnim, true)
         );
-        
+
         creature.setAnimation(
                 Creature.STATUS_CLIMBING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-climb.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(climbAnim, true)
         );
         
         creature.setAnimation(
                 Creature.STATUS_DEAD,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/imp-fall.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(fallAnim, true)
         );
         
         // Create size and position components
@@ -160,7 +160,7 @@ public class Level {
             y + size.getHeight()/2
         );
 
-        // Create entity and add components
+        // Create player entity and add components
         Entity e = world.createEntity();
         e.addComponent(pos);
         e.addComponent(size);
@@ -173,9 +173,11 @@ public class Level {
         world.addEntity(e);
     }
     
-    private void addTreasure(World world, String aniFile, int x, int y, int v) {
+    private void createTreasure(World world, String aniFile, int x, int y,
+            int value) {
+
         // Get the animation
-        Animation ani = assetManager.get(aniFile, Animation.class);
+        Animation ani = assets.get(aniFile, Animation.class);
         AnimationState aniState = new AnimationState(ani, true);
         
         // Create size and position entities
@@ -190,53 +192,43 @@ public class Level {
         e.addComponent(pos);
         e.addComponent(size);
         e.addComponent(new Appearance(aniState, 0));
-        e.addComponent(new Treasure(v));
+        e.addComponent(new Treasure(value));
 
         world.getManager(GroupManager.class).add(e, "TREASURE");
         
         world.addEntity(e);
         
         // Add to total treasure
-        totalTreasure += v;
+        totalTreasure += value;
     }
     
-    public void addEnemy(World world, int x, int y) {
+    public void createEnemy(World world, int x, int y) {
+        // Get animations for creature
+        Animation idleAnim = assets.get(Resources.ANIM_GOB_IDLE, Animation.class);
+        Animation walkAnim = assets.get(Resources.ANIM_GOB_WALK, Animation.class);
+        Animation climbAnim = assets.get(Resources.ANIM_GOB_CLIMB, Animation.class);
+        
         // Create creature for enemy
         Creature creature = new Creature();
        
         creature.setAnimation(
                 Creature.STATUS_IDLE,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/enemy-idle.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(idleAnim, true)
         );
         
         creature.setAnimation(
                 Creature.STATUS_WALKING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/enemy-walk.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(walkAnim, true)
         );
         
         creature.setAnimation(
                 Creature.STATUS_JUMPING,
                 null
         );
-        
+
         creature.setAnimation(
                 Creature.STATUS_CLIMBING,
-                new AnimationState(
-                        assetManager.get(
-                            "assets/sprites/enemy-climb.anim", 
-                             Animation.class
-                        ), true
-                )
+                new AnimationState(climbAnim, true)
         );
         
         creature.setAnimation(
@@ -266,9 +258,11 @@ public class Level {
         world.addEntity(e);
     }
     
-    public void addItem(World world, String aniFile, String t, int x, int y) {
+    public void createItem(World world, String aniFile, String type, int x,
+            int y) {
+
         // Get the animation
-        Animation ani = assetManager.get(aniFile, Animation.class);
+        Animation ani = assets.get(aniFile, Animation.class);
         AnimationState aniState = new AnimationState(ani, true);
         
         // Create size and position entities
@@ -283,7 +277,7 @@ public class Level {
         e.addComponent(pos);
         e.addComponent(size);
         e.addComponent(new Appearance(aniState, 0));
-        e.addComponent(new Item(t));
+        e.addComponent(new Item(type));
 
         world.getManager(GroupManager.class).add(e, "ITEM");
         
@@ -316,7 +310,9 @@ public class Level {
         
         for (int y = 0; y < terrainLayer.getHeight(); y++) {
             for (int x = 0; x < terrainLayer.getWidth(); x++) {
-                if ((isCellSolid(x, y - 1) && !isCellSolid(x, y)) || isCellLadder(x, y)) {
+                if ((isCellSolid(x, y-1) && !isCellSolid(x, y)) 
+                        || isCellLadder(x, y)) {
+
                     pathMap[y][x] = 1;
                 } else {
                     pathMap[y][x] = 0;
@@ -350,21 +346,6 @@ public class Level {
         
         TiledMapTile interactiveCell = terrainCell.getTile();
         return interactiveCell.getProperties().containsKey("solid");
-        /*
-
-        // If there's a ladder, the tile is not considered solid
-        if (isCellLadder(x, y)) {
-            return false;
-        }
-        
-        // If we get here, there was no ladder, so check if terrain is solid
-        if (terrainCell != null) {
-            TiledMapTile terrainTile = terrainCell.getTile();
-            return terrainTile.getProperties().containsKey("solid");
-        }
-        
-        return false;
-        */
     }
     
     public boolean isCellLadder(int x, int y) {

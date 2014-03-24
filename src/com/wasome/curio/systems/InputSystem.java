@@ -1,3 +1,21 @@
+/*
+ * Curio - A simple puzzle platformer game.
+ * Copyright (C) 2014  Michael Swiger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.wasome.curio.systems;
 
 import com.artemis.Aspect;
@@ -13,9 +31,12 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.maps.MapProperties;
+import com.wasome.curio.Collision;
 import com.wasome.curio.GameScreen;
 import com.wasome.curio.InventoryItem;
 import com.wasome.curio.Level;
+import com.wasome.curio.Resources;
 import com.wasome.curio.components.Appearance;
 import com.wasome.curio.components.Creature;
 import com.wasome.curio.components.Item;
@@ -25,8 +46,8 @@ import com.wasome.curio.components.Velocity;
 import com.wasome.curio.sprites.Animation;
 import com.wasome.curio.sprites.AnimationState;
 
-public class InputSystem extends IntervalEntitySystem
-    implements InputProcessor {
+public class InputSystem extends IntervalEntitySystem 
+implements InputProcessor {
     
     public static final int DIR_LEFT = 1;
     public static final int DIR_RIGHT = 2;
@@ -37,25 +58,26 @@ public class InputSystem extends IntervalEntitySystem
     @Mapper ComponentMapper<Size> sizeMapper;
     @Mapper ComponentMapper<Appearance> appearanceMapper;
     @Mapper ComponentMapper<Item> itemMapper;
-    private ImmutableBag<Entity> itemEntities;
+
+    private AssetManager assets;
     private Entity player;
     private Level level;
-    private int lastDir = DIR_LEFT;
     private GameScreen game;
     private Sound jumpSnd;
     private Sound itemPickupSnd;
     private Sound itemDropSnd;
+    private Sound doorSnd;
 
     public InputSystem(GameScreen game, Level level) {
         super(Aspect.getEmpty(), 50);
         this.game = game;
         this.level = level;
+        this.assets = game.getAssetManager();
         
-        AssetManager assetManager = game.getAssetManager();
-        
-        jumpSnd = assetManager.get("assets/sounds/jump.wav", Sound.class);
-        itemPickupSnd = assetManager.get("assets/sounds/item-pickup.wav", Sound.class);
-        itemDropSnd = assetManager.get("assets/sounds/item-drop.wav", Sound.class);
+        jumpSnd = assets.get(Resources.SND_JUMP, Sound.class);
+        itemPickupSnd = assets.get(Resources.SND_PICKUP, Sound.class);
+        itemDropSnd = assets.get(Resources.SND_DROP, Sound.class);
+        doorSnd = assets.get(Resources.SND_DOOR, Sound.class);
     }
 
     @Override
@@ -65,76 +87,88 @@ public class InputSystem extends IntervalEntitySystem
 
     @Override
     public boolean keyDown(int keycode) {
-        player = world.getManager(TagManager.class).getEntity("PLAYER");
-        
-        if (keycode == Keys.BACKSPACE) {
-            game.goToTitle();
+        // Game/UI keys
+        switch (keycode) {
+        case Keys.BACKSPACE:    game.goToTitle();  break;
+        case Keys.R:            game.resetLevel(); break;
+        case Keys.EQUALS:       game.nextLevel();  break;
+        case Keys.ENTER:        finishLevel();     break;
         }
         
-        if (keycode == Keys.R) {
-            game.resetLevel();
-            return true;
-        }
-        
-        if (keycode == Keys.EQUALS) {
-            game.nextLevel();
-            return true;
-        }
-        
-        if (game.getLevelComplete()) {
-            if (keycode == Keys.ENTER) {
-                game.nextLevel();
-            }
-            return true;
-        }
-        
+        // If the player doesn't exist don't continue
         if (player == null) {
             return true;
         }
         
-        AssetManager assetManager = game.getAssetManager();
-        Position p = positionMapper.get(player);
-        Velocity v = velocityMapper.get(player);
+        // If the player is dead, don't continue
         Creature creature = creatureMapper.get(player);
-        Size size = sizeMapper.get(player);
-        Appearance appearance = appearanceMapper.get(player);
-        
         if (creature.getStatus() == Creature.STATUS_DEAD) {
             return true;
         }
         
+        // If the level has been completed, don't continue
+        if (game.getLevelComplete()) {
+            return true;
+        }
+        
+        // Player keys
+        switch (keycode) {
+        case Keys.LEFT:         moveLeft();        break;
+        case Keys.RIGHT:        moveRight();       break;
+        case Keys.UP:           moveUp();          break;
+        case Keys.DOWN:         moveDown();        break;
+        case Keys.SPACE:        jump();            break;
+        case Keys.SHIFT_LEFT:   useItem();         break;
+        case Keys.CONTROL_LEFT: pickUpItem();      break;
+        case Keys.ALT_LEFT:     dropItem();        break;
+        }
+
+        return true;
+    }
+    
+    private void finishLevel() {
+        if (game.getLevelComplete()) {
+            game.nextLevel();
+        }
+    }
+    
+    private void moveLeft() {
+        Creature creature = creatureMapper.get(player);
+        creature.getAnimation(Creature.STATUS_IDLE).flip(false, false);
+        creature.getAnimation(Creature.STATUS_WALKING).flip(false, false);
+        creature.getAnimation(Creature.STATUS_JUMPING).flip(false, false);
+        
+        Velocity vel = velocityMapper.get(player);
+        vel.setX(-1);
+    }
+    
+    private void moveRight() {
+        Creature creature = creatureMapper.get(player);
+        creature.getAnimation(Creature.STATUS_IDLE).flip(true, false);
+        creature.getAnimation(Creature.STATUS_WALKING).flip(true, false);
+        creature.getAnimation(Creature.STATUS_JUMPING).flip(true, false);
+        
+        Velocity vel = velocityMapper.get(player);
+        vel.setX(1);
+    }
+    
+    private void moveUp() {
+        Appearance appearance = appearanceMapper.get(player);
+        Creature creature = creatureMapper.get(player);
+        Position pos = positionMapper.get(player);
+        Size size = sizeMapper.get(player);
+        Velocity vel = velocityMapper.get(player);
+        
         int status = creature.getStatus();
         int tileW = level.getTileWidth();
         int tileH = level.getTileHeight();
+        int tileX = (int) pos.getX() / tileW;
+        int tileBot = (int) (pos.getY() - (size.getHeight() / 2)) / tileH;
         
-        int tileX = (int) p.getX() / tileW;
-        int tileY = (int) p.getY() / tileH;
-        int tileBot = (int) (p.getY() - (size.getHeight() / 2)) / tileH;
-        
-        int newDir = 0;
-        
-        if (keycode == Keys.LEFT) {
-            creature.getAnimation(Creature.STATUS_IDLE).flip(false, false);
-            creature.getAnimation(Creature.STATUS_WALKING).flip(false, false);
-            creature.getAnimation(Creature.STATUS_JUMPING).flip(false, false);
-            v.setX(-1);
-            newDir = DIR_LEFT;
-        }
-        
-        if (keycode == Keys.RIGHT) {
-            creature.getAnimation(Creature.STATUS_IDLE).flip(true, false);
-            creature.getAnimation(Creature.STATUS_WALKING).flip(true, false);
-            creature.getAnimation(Creature.STATUS_JUMPING).flip(true, false);
-            v.setX(1);
-            newDir = DIR_RIGHT;
-        }
-        
-        lastDir = newDir != 0 ? newDir : lastDir;
-
-        if (keycode == Keys.UP && level.isCellLadder(tileX, tileBot)) {
-            v.setX(0);
-            v.setY(1);
-            p.setX(((int) p.getX() / 16) * 16 + 8);
+        if (level.isCellLadder(tileX, tileBot)) {
+            vel.setX(0);
+            vel.setY(1);
+            pos.setX(((int) pos.getX() / 16) * 16 + 8);
 
             if (status != Creature.STATUS_CLIMBING) {
                 creature.setStatus(Creature.STATUS_CLIMBING);
@@ -143,13 +177,26 @@ public class InputSystem extends IntervalEntitySystem
                 creature.getCurrentAnimation().resume();
             }
         }
+    }
+    
+    private void moveDown() {
+        Appearance appearance = appearanceMapper.get(player);
+        Creature creature = creatureMapper.get(player);
+        Position pos = positionMapper.get(player);
+        Velocity vel = velocityMapper.get(player);
         
-        if (keycode == Keys.DOWN && (level.isCellLadder(tileX, tileY - 1)
-                || level.isCellLadder(tileX, tileY))) {
+        int status = creature.getStatus();
+        int tileW = level.getTileWidth();
+        int tileH = level.getTileHeight();
+        int tileX = (int) pos.getX() / tileW;
+        int tileY = (int) pos.getY() / tileH;
+
+        if (level.isCellLadder(tileX, tileY - 1) 
+                || level.isCellLadder(tileX, tileY)) {
             
-            v.setX(0);
-            v.setY(-1);
-            p.setX(((int) p.getX() / 16) * 16 + 8);
+            vel.setX(0);
+            vel.setY(-1);
+            pos.setX(((int) pos.getX() / 16) * 16 + 8);
             
             if (status != Creature.STATUS_CLIMBING) {
                 creature.setStatus(Creature.STATUS_CLIMBING);
@@ -158,152 +205,159 @@ public class InputSystem extends IntervalEntitySystem
                 creature.getCurrentAnimation().resume();
             }
         }
+    }
+    
+    private void jump() {
+        Appearance appearance = appearanceMapper.get(player);
+        Creature creature = creatureMapper.get(player);
+        Velocity vel = velocityMapper.get(player);
         
-        if (keycode == Keys.SPACE && status != Creature.STATUS_JUMPING
+        int status = creature.getStatus();
+        
+        if (status != Creature.STATUS_JUMPING
                 && status != Creature.STATUS_CLIMBING) {
             
             creature.setStatus(Creature.STATUS_JUMPING);
-            v.setY(3.0f);
+            vel.setY(3.0f);
             appearance.setAnimation(creature.getCurrentAnimation());
             jumpSnd.play();
         }
+    }
+    
+    private void useItem() {
+        InventoryItem item = game.getItem();
         
-        itemEntities = world.getManager(GroupManager.class).getEntities("ITEM");
+        if (item == null) {
+            return;
+        }
         
-        // use item
-        if (keycode == Keys.SHIFT_LEFT) {                
-            InventoryItem item = game.getItem();
-            
-            if (item == null) {
-                return true;
-            }
+        Position pos = positionMapper.get(player);
+        
+        int tileW = level.getTileWidth();
+        int tileH = level.getTileHeight();
+        int tileX = (int) pos.getX() / tileW;
+        int tileY = (int) pos.getY() / tileH;
 
-            if (item.getType().equals("key")) {
-                if (level.isCellDoor(tileX, tileY) && !game.getLevelComplete()) {
-                    String animFile = "assets/sprites/"
-                                    + level.getTileProperties(
-                        Level.LAYER_INTERACTIVE,
-                        tileX,
-                        tileY
-                    ).get("animation").toString();
-                    
-                    AnimationState anim = new AnimationState(
-                        assetManager.get(animFile, Animation.class),
-                        false
+        if (item.getType().equals("key")) {
+            if (level.isCellDoor(tileX, tileY) && !game.getLevelComplete()) {
+                MapProperties props = level.getTileProperties(
+                    Level.LAYER_INTERACTIVE,
+                    tileX, tileY
+                );
+                
+                String animFile = "assets/sprites/"
+                                + props.get("animation").toString();
+                
+                Animation anim = assets.get(animFile, Animation.class);
+                AnimationState animState = new AnimationState(anim, false);
+
+                int x = (tileX * tileW) + tileW/2;
+                int y = (tileY * tileH) + tileH/2;
+                
+                Entity e = world.createEntity();
+                e.addComponent(new Position(x, y));
+                e.addComponent(new Size(tileW, tileH));
+                e.addComponent(new Appearance(animState, 0));
+                world.addEntity(e);
+                
+                doorSnd.play();
+                
+                game.setLevelComplete(true);
+            }
+        }
+    }
+    
+    private void pickUpItem() {
+        GroupManager groups = world.getManager(GroupManager.class);
+        ImmutableBag<Entity> itemEntities = groups.getEntities("ITEM");
+
+        for (int i = 0; i < itemEntities.size(); i++) {
+            Entity itemEntity = itemEntities.get(i);
+            Appearance itemApp = appearanceMapper.get(itemEntity);
+            Position itemPos = positionMapper.get(itemEntity);
+
+            if (Collision.boxCollision(player, itemEntity)) {
+                Item item = itemMapper.get(itemEntity);
+                String itemType = item.getType();
+                InventoryItem oldItem = game.getItem();
+                
+                if (oldItem != null) {
+                    level.createItem(
+                        world,
+                        oldItem.getAnimationPath(),
+                        oldItem.getType(),
+                        (int)itemPos.getX() / level.getTileWidth(),
+                        (int)itemPos.getY() / level.getTileHeight()
                     );
-
-                    Entity e = world.createEntity();
-                    e.addComponent(new Position((tileX * tileW) + tileW/2, (tileY * tileH) + tileH/2));
-                    e.addComponent(new Size(tileW, tileH));
-                    e.addComponent(new Appearance(anim, 0));
-                    world.addEntity(e);
-                    
-                    Sound snd = assetManager.get("assets/sounds/door-open.wav", Sound.class);
-                    snd.play();
-                    
-                    game.setLevelComplete(true);
                 }
+                
+                Animation rawAnim = itemApp.getAnimation().getRaw();
+                game.setItem(new InventoryItem(itemType, rawAnim));
+                
+                itemPickupSnd.play();
+                
+                itemEntity.deleteFromWorld();
+                
+                break;
+            }
+        }
+    }
+    
+    private void dropItem() {
+        InventoryItem item = game.getItem();
+        
+        if (item == null) {
+            return;
+        }
+        
+        GroupManager groups = world.getManager(GroupManager.class);
+        ImmutableBag<Entity> itemEntities = groups.getEntities("ITEM");
+
+        for (int i = 0; i < itemEntities.size(); i++) {
+            Entity itemEntity = itemEntities.get(i);
+
+            if (Collision.boxCollision(player, itemEntity)) {
+                return;
             }
         }
         
-        // action/grab item
-        if (keycode == Keys.CONTROL_LEFT) {
-            Position p1 = positionMapper.get(player);
-            Size s1 = sizeMapper.get(player);
-            Position p2;
-            Size s2;
-
-            for (int i = 0; i < itemEntities.size(); i++) {
-                Entity itemEntity = itemEntities.get(i);
-                p2 = positionMapper.get(itemEntity);
-                s2 = sizeMapper.get(itemEntity);
-                Appearance itemApp = appearanceMapper.get(itemEntity);
-
-                if (MovementSystem.checkCollision(p1, s1, p2, s2)) {
-                    Item item = itemMapper.get(itemEntity);
-                    String itemType = item.getType();
-                    InventoryItem oldItem = game.getItem();
-                    
-                    if (oldItem != null) {
-                        level.addItem(
-                            world,
-                            oldItem.getAnimationPath(),
-                            oldItem.getType(),
-                            (int)p2.getX() / level.getTileWidth(),
-                            (int)p2.getY() / level.getTileHeight()
-                        );
-                    }
-                    
-                    game.setItem(new InventoryItem(itemType, itemApp.getAnimation().getRaw()));
-                    
-                    itemPickupSnd.play();
-                    
-                    itemEntity.deleteFromWorld();
-                    
-                    return true;
-                }
-            }
-        }
+        Position playerPos = positionMapper.get(player);
         
-        // drop item
-        if (keycode == Keys.ALT_LEFT) {
-            InventoryItem item = game.getItem();
-            
-            if (item == null) {
-                return true;
-            }
-            
-            Position p1 = positionMapper.get(player);
-            Size s1 = sizeMapper.get(player);
-            Position p2;
-            Size s2;
-
-            for (int i = 0; i < itemEntities.size(); i++) {
-                Entity itemEntity = itemEntities.get(i);
-                p2 = positionMapper.get(itemEntity);
-                s2 = sizeMapper.get(itemEntity);
-                if (MovementSystem.checkCollision(p1, s1, p2, s2)) {
-                    return true;
-                }
-            }
-            level.addItem(
-                world,
-                item.getAnimationPath(),
-                item.getType(),
-                (int)p1.getX() / level.getTileWidth(),
-                (int)p1.getY() / level.getTileHeight()
-            );
-            
-            game.setItem(null);
-            
-            itemDropSnd.play();
-        }
+        level.createItem(
+            world,
+            item.getAnimationPath(),
+            item.getType(),
+            (int)playerPos.getX() / level.getTileWidth(),
+            (int)playerPos.getY() / level.getTileHeight()
+        );
         
-        return true;
+        game.setItem(null);
+        
+        itemDropSnd.play();
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        if (player != null) {
-            Velocity v = velocityMapper.get(player);
-            Creature creature = creatureMapper.get(player);
+        if (player == null) return true;
+       
+        Velocity v = velocityMapper.get(player);
+        Creature creature = creatureMapper.get(player);
 
-            if ((keycode == Keys.LEFT && !Gdx.input.isKeyPressed(Keys.RIGHT)) ||
+        if ((keycode == Keys.LEFT && !Gdx.input.isKeyPressed(Keys.RIGHT)) ||
                 (keycode == Keys.RIGHT && !Gdx.input.isKeyPressed(Keys.LEFT))) {
-                
-                v.setX(0);
-            }
             
-            if (((keycode == Keys.UP && !Gdx.input.isKeyPressed(Keys.DOWN)) ||
-                (keycode == Keys.DOWN && !Gdx.input.isKeyPressed(Keys.UP)))
+            v.setX(0);
+        }
+        
+        if (((keycode == Keys.UP && !Gdx.input.isKeyPressed(Keys.DOWN))
+                || (keycode == Keys.DOWN && !Gdx.input.isKeyPressed(Keys.UP)))
                 && creature.getStatus() == Creature.STATUS_CLIMBING) {
-                    
-                    creature.getCurrentAnimation().pause();
-                    v.setY(0);
-                }
+                
+                creature.getCurrentAnimation().pause();
+                v.setY(0);
         }
 
-        return false;
+        return true;
     }
 
     @Override
@@ -312,17 +366,17 @@ public class InputSystem extends IntervalEntitySystem
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+    public boolean touchDown(int screenX, int screenY, int ptr, int button) {
         return false;
     }
 
     @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+    public boolean touchUp(int screenX, int screenY, int ptr, int button) {
         return false;
     }
 
     @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
+    public boolean touchDragged(int screenX, int screenY, int ptr) {
         return false;
     }
 
